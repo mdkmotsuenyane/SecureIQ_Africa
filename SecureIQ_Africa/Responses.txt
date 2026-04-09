@@ -1,0 +1,59 @@
+Q: How are you?
+A: I’m doing great, thank you! I’m here to help you with cybersecurity awareness and safety tips. How can I assist you today?
+
+Q: What is phishing?
+A: Phishing is a type of cyber attack where attackers trick you into giving away sensitive information like passwords, banking details, or personal data. This is usually done through fake emails, messages, or websites that look legitimate.
+
+Q: How can I identify a phishing email?
+A: Look out for suspicious sender addresses, urgent or threatening language, unexpected attachments, and links that don’t match official websites. Always verify before clicking.
+
+Q: What is safe browsing?
+A: Safe browsing means using the internet in a way that protects your personal information and devices. This includes visiting secure websites (https), avoiding suspicious links, and not downloading untrusted files.
+
+Q: Why is cybersecurity important?
+A: Cybersecurity protects your personal information, finances, and identity from cybercriminals. It helps prevent fraud, data breaches, and unauthorized access.
+
+Q: What is a strong password?
+A: A strong password is long, unique, and includes a mix of uppercase letters, lowercase letters, numbers, and symbols. Avoid using easily guessed information like your name or birthdate.
+
+Q: How often should I change my passwords?
+A: You should change your passwords regularly, especially if you suspect a breach. It’s also important not to reuse passwords across multiple accounts.
+
+Q: What is two-factor authentication (2FA)?
+A: Two-factor authentication adds an extra layer of security by requiring a second form of verification, such as a code sent to your phone, in addition to your password.
+
+Q: What should I do if I clicked a suspicious link?
+A: Disconnect from the internet, run a security scan, and change your passwords immediately. If financial information is involved, contact your bank.
+
+Q: What is malware?
+A: Malware is malicious software designed to harm your device or steal your data. Examples include viruses, ransomware, and spyware.
+
+Q: How can I protect my personal information online?
+A: Avoid sharing sensitive information publicly, use strong passwords, enable 2FA, and only use trusted websites and apps.
+
+Q: What is ransomware?
+A: Ransomware is a type of malware that locks your files or device and demands payment to restore access.
+
+Q: Is public Wi-Fi safe?
+A: Public Wi-Fi can be risky. Avoid accessing sensitive accounts on public networks unless you use a secure connection like a VPN.
+
+Q: What is a secure website?
+A: A secure website uses HTTPS and has a padlock symbol in the address bar. This means your data is encrypted.
+
+Q: How can I keep my devices safe?
+A: Keep your software updated, install antivirus protection, avoid suspicious downloads, and use strong passwords.
+
+Q: What should I do if I think my account has been hacked?
+A: Change your password immediately, enable 2FA, and check for unusual activity. Notify the service provider if necessary.
+
+Q: What is social engineering?
+A: Social engineering is when attackers manipulate people into giving away confidential information by pretending to be trustworthy.
+
+Q: Can I trust all emails from companies?
+A: No. Always verify emails, even if they appear to come from trusted companies. Cybercriminals often impersonate legitimate organizations.
+
+Q: What is data privacy?
+A: Data privacy is the protection of your personal information and how it is collected, used, and shared online.
+
+Q: How can SecureIQ Africa help me?
+A: SecureIQ Africa provides cybersecurity awareness, training, and guidance to help you stay safe online and protect your digital life.
