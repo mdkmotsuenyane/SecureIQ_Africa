@@ -33,7 +33,6 @@ namespace SecureIQ_Africa
                     }
                 }
             }
-
             return "Sorry, I don't understand that yet. Try asking about passwords, phishing, malware, or Wi-Fi security.";
         }
 

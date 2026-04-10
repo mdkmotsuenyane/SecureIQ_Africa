@@ -6,7 +6,6 @@ using System.Speech.Synthesis;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using static System.Console;
 
 namespace SecureIQ_Africa
 {

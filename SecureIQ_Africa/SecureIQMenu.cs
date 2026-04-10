@@ -23,7 +23,7 @@ public class SecureIQMenu
     // divider line
     static void Divider(char symbol = '=', int length = 50)
     {
-        ForegroundColor = ConsoleColor.Red;
+        ForegroundColor = ConsoleColor.Blue;
         WriteLine(new string(symbol, length));
         ResetColor();
     }
@@ -31,7 +31,7 @@ public class SecureIQMenu
     // header
     static void Header(string title)
     {
-        ForegroundColor = ConsoleColor.Cyan;
+        ForegroundColor = ConsoleColor.Yellow;
         Divider();
         WriteLine(title.ToUpper());
         Divider();
@@ -44,8 +44,8 @@ public class SecureIQMenu
         Clear();
         //prints logo ascii art
         WriteLine("  █████████                                                  █████    ██████         █████████      ██████             ███                    \r\n ███░░░░░███                                                ░░███   ███░░░░███      ███░░░░░███    ███░░███           ░░░                     \r\n░███    ░░░   ██████   ██████  █████ ████ ████████   ██████  ░███  ███    ░░███    ░███    ░███   ░███ ░░░  ████████  ████   ██████   ██████  \r\n░░█████████  ███░░███ ███░░███░░███ ░███ ░░███░░███ ███░░███ ░███ ░███     ░███    ░███████████  ███████   ░░███░░███░░███  ███░░███ ░░░░░███ \r\n ░░░░░░░░███░███████ ░███ ░░░  ░███ ░███  ░███ ░░░ ░███████  ░███ ░███   ██░███    ░███░░░░░███ ░░░███░     ░███ ░░░  ░███ ░███ ░░░   ███████ \r\n ███    ░███░███░░░  ░███  ███ ░███ ░███  ░███     ░███░░░   ░███ ░░███ ░░████     ░███    ░███   ░███      ░███      ░███ ░███  ███ ███░░███ \r\n░░█████████ ░░██████ ░░██████  ░░████████ █████    ░░██████  █████ ░░░██████░██    █████   █████  █████     █████     █████░░██████ ░░████████\r\n ░░░░░░░░░   ░░░░░░   ░░░░░░    ░░░░░░░░ ░░░░░      ░░░░░░  ░░░░░    ░░░░░░ ░░    ░░░░░   ░░░░░  ░░░░░     ░░░░░     ░░░░░  ░░░░░░   ░░░░░░░░ \r\n                                                                                                                                              \r\n                                                                                                                                              \r\n                                                                                                                                              ");
-        WriteLine("                       .,,uod8B8bou,,.\r\n              ..,uod8BBBBBBBBBBBBBBBBRPFT?l!i:.\r\n         ,=m8BBBBBBBBBBBBBBBRPFT?!||||||||||||||\r\n         !...:!TVBBBRPFT||||||||||!!^^\"\"'   ||||\r\n         !.......:!?|||||!!^^\"\"'            ||||\r\n         !.........||||                     ||||\r\n         !.........||||  ##                 ||||\r\n         !.........||||                     ||||\r\n         !.........||||                     ||||\r\n         !.........||||                     ||||\r\n         !.........||||                     ||||\r\n         `.........||||                    ,||||\r\n          .;.......||||               _.-!!|||||\r\n   .,uodWBBBBb.....||||       _.-!!|||||||||!:'\r\n!YBBBBBBBBBBBBBBb..!|||:..-!!|||||||!iof68BBBBBb....\r\n!..YBBBBBBBBBBBBBBb!!||||||||!iof68BBBBBBRPFT?!::   `.\r\n!....YBBBBBBBBBBBBBBbaaitf68BBBBBBRPFT?!:::::::::     `.\r\n!......YBBBBBBBBBBBBBBBBBBBRPFT?!::::::;:!^\"`;:::       `.\r\n!........YBBBBBBBBBBRPFT?!::::::::::^''...::::::;         iBBbo.\r\n`..........YBRPFT?!::::::::::::::::::::::::;iof68bo.      WBBBBbo.\r\n  `..........:::::::::::::::::::::::;iof688888888888b.     `YBBBP^'\r\n    `........::::::::::::::::;iof688888888888888888888b.     `\r\n      `......:::::::::;iof688888888888888888888888888888b.\r\n        `....:::;iof688888888888888888888888888888888899fT!\r\n          `..::!8888888888888888888888888888888899fT|!^\"'\r\n            `' !!988888888888888888888888899fT|!^\"'\r\n                `!!8888888888888888899fT|!^\"'\r\n                  `!988888888899fT|!^\"'\r\n                    `!9899fT|!^\"'\r\n                      `!^\"'\r\n");
-        WriteLine("*********** SecureIQ Africa ***********");
+        WriteLine("                             @@@@@@@@@@@@@@@@@@@@@                              \r\n                           %@@ %%%&%&%%%%%%%%&@ .@@                             \r\n                       .@@@   @ @ *@      (@ ## @  #@@@                         \r\n                       .@% %  % & ,@       @ & @   @ @@                         \r\n                       .@% % .,& @    @@@   /.# @  @ @@                         \r\n                       .@% % % @ @   @@@@    %..&  @ @@                         \r\n                       .@% % % @ @   @@@@    %..&  @ @@                         \r\n                        @@ @ % @ @  @@@@@@   %.,&  , @@                         \r\n                        .@@ @% @ @           %.,&.( @@                          \r\n                          @@  @@ @,@      &@ %.,@ #@@                           \r\n                            @@@  @( @. & @& @(  @@@                             \r\n                               @@@@  @* @/  @@@#                                \r\n                                   @@@# @@@%                                    \r\n                                       *                                       ");
+            WriteLine("*********** SecureIQ Africa ***********");
 
         TypeText("Welcome to SecureIQ Africa");
 
@@ -73,10 +73,12 @@ public class SecureIQMenu
     public static void ShowMainMenu()
     {
         Clear();
+       
         Header("Ask me anything about cybersecurity (type 'exit' to quit)");
 
         string input;
 
+        //give user input
         do
         {
             Write("> ");
