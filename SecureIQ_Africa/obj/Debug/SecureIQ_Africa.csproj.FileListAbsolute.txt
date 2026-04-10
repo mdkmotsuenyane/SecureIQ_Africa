@@ -1,0 +1,8 @@
+C:\Users\Student\source\repos\SecureIQ_Africa\SecureIQ_Africa\bin\Debug\SecureIQ_Africa.exe.config
+C:\Users\Student\source\repos\SecureIQ_Africa\SecureIQ_Africa\bin\Debug\SecureIQ_Africa.exe
+C:\Users\Student\source\repos\SecureIQ_Africa\SecureIQ_Africa\bin\Debug\SecureIQ_Africa.pdb
+C:\Users\Student\source\repos\SecureIQ_Africa\SecureIQ_Africa\obj\Debug\SecureIQ_Africa.csproj.AssemblyReference.cache
+C:\Users\Student\source\repos\SecureIQ_Africa\SecureIQ_Africa\obj\Debug\SecureIQ_Africa.csproj.CoreCompileInputs.cache
+C:\Users\Student\source\repos\SecureIQ_Africa\SecureIQ_Africa\obj\Debug\SecureIQ_Africa.exe
+C:\Users\Student\source\repos\SecureIQ_Africa\SecureIQ_Africa\obj\Debug\SecureIQ_Africa.pdb
+C:\Users\Student\source\repos\SecureIQ_Africa\SecureIQ_Africa\obj\Debug\SecureIQ_Africa.exe.config

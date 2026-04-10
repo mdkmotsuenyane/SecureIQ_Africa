@@ -1,55 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static System.Console;
 
 namespace SecureIQ_Africa
 {
     internal class Response
     {
-        //get and set name
         public string name { get; set; }
 
+        // create a new intsance of ResponseData class
+        private SecureData data = new SecureData();
 
-        //dictionary is used to store all the posssible questions
-        private Dictionary<string, (string[] keywords, string response)> secureData =
-            new Dictionary<string, (string[], string)>()
-        {
-            {
-                "password",
-                (new[] { "password", "pass", "login", "credential" },
-                "Avoid using personal information and use strong passwords with uppercase, lowercase, numbers, and symbols.")
-            },
-            {
-                "phishing",
-                (new[] { "phishing", "scam", "fake email", "suspicious link" },
-                "Do not click suspicious links. Always verify the sender before responding.")
-            },
-            {
-                "malware",
-                (new[] { "malware", "virus", "trojan", "spyware" },
-                "Install antivirus software and avoid downloading from untrusted sources.")
-            },
-            {
-                "wifi",
-                (new[] { "wifi", "public wifi", "network", "hotspot" },
-                "Avoid sensitive transactions on public Wi-Fi. Use a VPN if possible.")
-            },
-            {
-                "greeting",
-                (new[] { "hello", "hi", "hey" },
-                "Hello! I'm your cybersecurity awareness bot.")
-            },
-            {
-                "help",
-                (new[] { "help", "what can i ask", "what do you know" },
-                "You can ask me about passwords, phishing, malware, safe browsing, and more.")
-            }
-        };
-
-        //used to get response
         public string GetResponse(string userInput)
         {
             if (string.IsNullOrWhiteSpace(userInput))
@@ -57,7 +23,7 @@ namespace SecureIQ_Africa
 
             userInput = userInput.ToLower();
 
-            foreach (var item in secureData)
+            foreach (var item in data.secureData)
             {
                 foreach (var keyword in item.Value.keywords)
                 {
@@ -68,25 +34,28 @@ namespace SecureIQ_Africa
                 }
             }
 
-            return "Sorry, I don't understand that yet.";
+            return "Sorry, I don't understand that yet. Try asking about passwords, phishing, malware, or Wi-Fi security.";
         }
 
-        //  prints response
         public void Ask(string question)
         {
-            string response;
-            response = GetResponse(question);
-            WriteLine(name + " " + response);
+            string response = GetResponse(question);
+            WriteLine(name + " ," + response);
+            WriteLine("");
         }
-
-
 
         public void Welcome()
         {
-            string message = " Welcome to SecureIQ Africa, your trusted partner in cybersecurity awareness. How can we help you today : ";
-            WriteLine(" █████   ███   █████          ████                                            \r\n░░███   ░███  ░░███          ░░███                                            \r\n ░███   ░███   ░███   ██████  ░███   ██████   ██████  █████████████    ██████ \r\n ░███   ░███   ░███  ███░░███ ░███  ███░░███ ███░░███░░███░░███░░███  ███░░███\r\n ░░███  █████  ███  ░███████  ░███ ░███ ░░░ ░███ ░███ ░███ ░███ ░███ ░███████ \r\n  ░░░█████░█████░   ░███░░░   ░███ ░███  ███░███ ░███ ░███ ░███ ░███ ░███░░░  \r\n    ░░███ ░░███     ░░██████  █████░░██████ ░░██████  █████░███ █████░░██████ \r\n     ░░░   ░░░       ░░░░░░  ░░░░░  ░░░░░░   ░░░░░░  ░░░░░ ░░░ ░░░░░  ░░░░░░  \r\n                                                                              \r\n                                                                              \r\n                                                                              ");
-            WriteLine(message + " " + name);
-        }
+            string message;
 
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.BackgroundColor = ConsoleColor.Black;
+
+            message = " Welcome to SecureIQ Africa, your trusted partner in cybersecurity awareness. How can we help you today : ";
+            WriteLine("");
+            WriteLine(message + " " + name);
+
+            ResetColor();
+        }
     }
 }
