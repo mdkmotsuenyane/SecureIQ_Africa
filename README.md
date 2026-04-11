@@ -21,12 +21,12 @@ It features a simple AI-style keyword response system, typing effects, speech sy
 
 ## 🏗️ Project Structure
 SecureIQ_Africa/
-│
-├── SecureIQMenu.cs # Main UI, menu system, and program flow
-├── Response.cs # Chatbot logic and response handling
-├── SecureData.cs # Stores cybersecurity keywords & responses
-├── Program.cs # Application entry point
-└── chat.txt # Auto-generated chat log file depend ingon the name of the user maybe john.txt 
+- │
+- ├── SecureIQMenu.cs # Main UI, menu system, and program flow
+- ├── Response.cs # Chatbot logic and response handling
+- ├── SecureData.cs # Stores cybersecurity keywords & responses
+- ├── Program.cs # Application entry point
+- └── chat.txt # Auto-generated chat log file depend ingon the name of the user maybe john.txt 
 
 ---
 
