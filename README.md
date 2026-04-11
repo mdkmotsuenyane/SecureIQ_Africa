@@ -56,9 +56,9 @@ git clone https://github.com/your-username/SecureIQ_Africa.git
 # Open the project in Visual Studio
 # Build and Run (F5)
 ```
-##👨‍💻 Author
+## 👨‍💻 Author
 - Mokadi Motsuenyane ST10480772 DIS2 Group 3
 
-##📜 License
+## 📜 License
 
 - This project is for educational purposes for IIE Rosebank College. 
