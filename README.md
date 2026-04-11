@@ -20,6 +20,8 @@ It features a simple AI-style keyword response system, typing effects, speech sy
 ---
 
 ## 🏗️ Project Structure
+
+```
 SecureIQ_Africa/
 - │
 - ├── SecureIQMenu.cs # Main UI, menu system, and program flow
@@ -28,6 +30,7 @@ SecureIQ_Africa/
 - ├── Program.cs # Application entry point
 - └── chat.txt # Auto-generated chat log file depend ingon the name of the user maybe john.txt 
 
+```
 ---
 
 ## ▶️ How to Run
