@@ -37,6 +37,16 @@ SecureIQ_Africa/
 - .NET Framework or .NET Console App support
 - Windows OS (required for System.Speech.Synthesis)
 
+## 💡 How It Works
+- ASCII logo is printed
+- User enters their name
+- System creates a personalized chat log file
+- Welcome message is displayed with speech + animation
+- User types cybersecurity questions
+- Bot matches keywords and responds
+- All chats are saved in a .txt file
+- Type exit to quit the application
+- 
 ### Steps
 
 ```bash
