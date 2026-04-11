@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{85F147DC-C06A-459C-A5E0-9E0AECEBE574}</ProjectGuid>
+    <ProjectGuid>{CDD7FAF8-333E-48AF-8E37-3DDCAD21C3B3}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>SecureIQ_Africa</RootNamespace>
     <AssemblyName>SecureIQ_Africa</AssemblyName>
@@ -44,11 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SecureIQMenu.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Response.cs" />
     <Compile Include="SecureData.cs" />
+    <Compile Include="SecureIQMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

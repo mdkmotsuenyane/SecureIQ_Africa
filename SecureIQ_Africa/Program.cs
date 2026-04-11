@@ -14,10 +14,10 @@ namespace SecureIQ_Africa
         static void Main(string[] args)
         {
             //calls the welcome message method from the main class
-           SecureIQMenu.ShowWelcomeScreen();
-          
+            SecureIQMenu.ShowWelcomeScreen();
+
 
         }
-  
+
     }
 }

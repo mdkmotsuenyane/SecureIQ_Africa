@@ -18,43 +18,42 @@ namespace SecureIQ_Africa
 
         public string GetResponse(string userInput)
         {
+            //checks if the line is empty
             if (string.IsNullOrWhiteSpace(userInput))
                 return "Please ask me something about cybersecurity!";
 
-            userInput = userInput.ToLower();
+            //get the user input and turns into lower case
+            userInput = userInput.ToLower().Trim();
 
-            foreach (var item in data.secureData)
+            var sortedData = data.secureData
+                .OrderByDescending(x => x.Value.keywords.Max(k => k.Length));
+
+            //slipt thespaces in between
+            var words = userInput.Split(' ');
+
+            foreach (var item in sortedData)
             {
                 foreach (var keyword in item.Value.keywords)
                 {
-                    if (userInput.Contains(keyword))
+                    if (words.Contains(keyword) || userInput.Contains(keyword))
                     {
                         return item.Value.response;
                     }
                 }
             }
+            //error message
+            ForegroundColor = ConsoleColor.Red;
             return "Sorry, I don't understand that yet. Try asking about passwords, phishing, malware, or Wi-Fi security.";
         }
 
-        public void Ask(string question)
+        public string Ask(string question)
         {
             string response = GetResponse(question);
-            WriteLine(name + " ," + response);
-            WriteLine("");
+            WriteLine($"{name}, {response}");
+            WriteLine();
+            return response;
         }
 
-        public void Welcome()
-        {
-            string message;
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.BackgroundColor = ConsoleColor.Black;
-
-            message = " Welcome to SecureIQ Africa, your trusted partner in cybersecurity awareness. How can we help you today : ";
-            WriteLine("");
-            WriteLine(message + " " + name);
-
-            ResetColor();
-        }
     }
 }
