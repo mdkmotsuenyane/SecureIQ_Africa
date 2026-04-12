@@ -10,6 +10,7 @@ It features a simple AI-style keyword response system, typing effects, speech sy
 
 - 💬 Interactive cybersecurity chatbot
 - 🧠 Keyword-based response engine
+- 
 - 🗣️ Speech synthesis welcome message
 - ⌨️ Typing animation effect
 - 📁 Automatic chat logging to text file
@@ -40,12 +41,16 @@ SecureIQ_Africa/
 - .NET Framework or .NET Console App support
 - Windows OS (required for System.Speech.Synthesis)
 
+
+
 ## 💡 How It Works
 - ASCII logo is printed
 - User enters their name
+- Validates the name
 - System creates a personalized chat log file
 - Welcome message is displayed with speech + animation
 - User types cybersecurity questions
+- Validates responses
 - Bot matches keywords and responds
 - All chats are saved in a .txt file
 - Type exit to quit the application
@@ -59,6 +64,9 @@ git clone https://github.com/mdkmotsuenyane/SecureIQ_Africa.git
 # Open the project in Visual Studio
 # Build and Run (F5)
 ```
+### Youtube Link
+```https://youtu.be/G1AP2P_0bs4?si=v5UgQFcuTsKxug_s```
+
 ## 👨‍💻 Author
 - Mokadi Motsuenyane ST10480772 DIS2 Group 3
 
