@@ -23,12 +23,12 @@ It features a simple AI-style keyword response system, typing effects, speech sy
 
 ```
 SecureIQ_Africa/
-- │
-- ├── SecureIQMenu.cs # Main UI, menu system, and program flow
-- ├── Response.cs # Chatbot logic and response handling
-- ├── SecureData.cs # Stores cybersecurity keywords & responses
-- ├── Program.cs # Application entry point
-- └── chat.txt # Auto-generated chat log file depend ingon the name of the user maybe john.txt 
+│
+├── SecureIQMenu.cs # Main UI, menu system, and program flow
+├── Response.cs # Chatbot logic and response handling
+├── SecureData.cs # Stores cybersecurity keywords & responses
+├── Program.cs # Application entry point
+└── chat.txt # Auto-generated chat log file depend ingon the name of the user maybe john.txt 
 
 ```
 ---
@@ -49,12 +49,12 @@ SecureIQ_Africa/
 - Bot matches keywords and responds
 - All chats are saved in a .txt file
 - Type exit to quit the application
-- 
+
 ### Steps
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/SecureIQ_Africa.git
+git clone https://github.com/mdkmotsuenyane/SecureIQ_Africa.git
 
 # Open the project in Visual Studio
 # Build and Run (F5)
