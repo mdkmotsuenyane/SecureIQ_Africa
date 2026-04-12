@@ -10,7 +10,6 @@ It features a simple AI-style keyword response system, typing effects, speech sy
 
 - 💬 Interactive cybersecurity chatbot
 - 🧠 Keyword-based response engine
-- 
 - 🗣️ Speech synthesis welcome message
 - ⌨️ Typing animation effect
 - 📁 Automatic chat logging to text file
