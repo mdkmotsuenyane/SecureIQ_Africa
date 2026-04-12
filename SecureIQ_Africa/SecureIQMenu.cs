@@ -7,7 +7,7 @@ using static System.Console;
 
 public class SecureIQMenu
 {
-    //crete new filepath 
+    // create new filepath 
     static string filePath;
 
     // creates a new instance for Response Class
@@ -25,7 +25,7 @@ public class SecureIQMenu
     }
 
     // divider line
-    static void Divider(char symbol = '=', int length = 50)
+    static void Divider(char symbol = '=', int length = 70)
     {
         ForegroundColor = ConsoleColor.Blue;
         WriteLine(new string(symbol, length));
@@ -50,38 +50,60 @@ public class SecureIQMenu
         //prints logo ascii art
         WriteLine("  █████████                                                  █████    ██████         █████████      ██████             ███                    \r\n ███░░░░░███                                                ░░███   ███░░░░███      ███░░░░░███    ███░░███           ░░░                     \r\n░███    ░░░   ██████   ██████  █████ ████ ████████   ██████  ░███  ███    ░░███    ░███    ░███   ░███ ░░░  ████████  ████   ██████   ██████  \r\n░░█████████  ███░░███ ███░░███░░███ ░███ ░░███░░███ ███░░███ ░███ ░███     ░███    ░███████████  ███████   ░░███░░███░░███  ███░░███ ░░░░░███ \r\n ░░░░░░░░███░███████ ░███ ░░░  ░███ ░███  ░███ ░░░ ░███████  ░███ ░███   ██░███    ░███░░░░░███ ░░░███░     ░███ ░░░  ░███ ░███ ░░░   ███████ \r\n ███    ░███░███░░░  ░███  ███ ░███ ░███  ░███     ░███░░░   ░███ ░░███ ░░████     ░███    ░███   ░███      ░███      ░███ ░███  ███ ███░░███ \r\n░░█████████ ░░██████ ░░██████  ░░████████ █████    ░░██████  █████ ░░░██████░██    █████   █████  █████     █████     █████░░██████ ░░████████\r\n ░░░░░░░░░   ░░░░░░   ░░░░░░    ░░░░░░░░ ░░░░░      ░░░░░░  ░░░░░    ░░░░░░ ░░    ░░░░░   ░░░░░  ░░░░░     ░░░░░     ░░░░░  ░░░░░░   ░░░░░░░░ \r\n                                                                                                                                              \r\n                                                                                                                                              \r\n                                                                                                                                              ");
         WriteLine("                       .,,uod8B8bou,,.\r\n              ..,uod8BBBBBBBBBBBBBBBBRPFT?l!i:.\r\n         ,=m8BBBBBBBBBBBBBBBRPFT?!||||||||||||||\r\n         !...:!TVBBBRPFT||||||||||!!^^\"\"'   ||||\r\n         !.......:!?|||||!!^^\"\"'            ||||\r\n         !.........||||                     ||||\r\n         !.........||||  ##                 ||||\r\n         !.........||||                     ||||\r\n         !.........||||                     ||||\r\n         !.........||||                     ||||\r\n         !.........||||                     ||||\r\n         `.........||||                    ,||||\r\n          .;.......||||               _.-!!|||||\r\n   .,uodWBBBBb.....||||       _.-!!|||||||||!:'\r\n!YBBBBBBBBBBBBBBb..!|||:..-!!|||||||!iof68BBBBBb....\r\n!..YBBBBBBBBBBBBBBb!!||||||||!iof68BBBBBBRPFT?!::   `.\r\n!....YBBBBBBBBBBBBBBbaaitf68BBBBBBRPFT?!:::::::::     `.\r\n!......YBBBBBBBBBBBBBBBBBBBRPFT?!::::::;:!^\"`;:::       `.\r\n!........YBBBBBBBBBBRPFT?!::::::::::^''...::::::;         iBBbo.\r\n`..........YBRPFT?!::::::::::::::::::::::::;iof68bo.      WBBBBbo.\r\n  `..........:::::::::::::::::::::::;iof688888888888b.     `YBBBP^'\r\n    `........::::::::::::::::;iof688888888888888888888b.     `\r\n      `......:::::::::;iof688888888888888888888888888888b.\r\n        `....:::;iof688888888888888888888888888888888899fT!\r\n          `..::!8888888888888888888888888888888899fT|!^\"'\r\n            `' !!988888888888888888888888899fT|!^\"'\r\n                `!!8888888888888888899fT|!^\"'\r\n                  `!988888888899fT|!^\"'\r\n                    `!9899fT|!^\"'\r\n                      `!^\"'\r\n");
-       //resets colour
+        //resets colour
         ResetColor();
         ForegroundColor = ConsoleColor.DarkBlue;
         WriteLine("*********** SecureIQ Africa ***********");
         ResetColor();
         TypeText("Welcome to SecureIQ Africa");
 
+        //message
         string message =
-            "Welcome to SecureIQ Africa, your trusted cybersecurity assistant.";
+              "Welcome to SecureIQ Africa, your trusted cybersecurity assistant.";
 
-        //generates voice that welcomes the user
+        //system voice the welcomes the user
         SpeechSynthesizer voice = new SpeechSynthesizer();
         voice.Speak(message);
-        ForegroundColor = ConsoleColor.DarkYellow;
-        Write("What is your name: ");
-        ResetColor();
-        string name = ReadLine();
 
-        // store name in Response class
+        // declaration
+        string name;
+
+        do
+        {
+            //prompt for name
+            ForegroundColor = ConsoleColor.DarkYellow;
+            Write("What is your name: ");
+            ResetColor();
+
+            name = ReadLine();
+
+            //validates the name
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                ForegroundColor = ConsoleColor.Red;
+                WriteLine("Name cannot be empty. Please enter a valid name.");
+                ResetColor();
+            }
+
+        } while (string.IsNullOrWhiteSpace(name));
+        //instance name from Response classe
         respond.name = name;
 
-        // create safe file name
+        // safe filename
         string cleanName = string.Concat(name.Split(Path.GetInvalidFileNameChars()));
+        if (string.IsNullOrWhiteSpace(cleanName))
+            cleanName = "User";
+
         filePath = $"{cleanName}_chatlog.txt";
 
-        // start session
         File.AppendAllText(filePath, $"\n===== New Session: {DateTime.Now} =====\n");
+
         TypeText($"Hi {name}, welcome to SecureIQ Africa!");
 
         ForegroundColor = ConsoleColor.DarkBlue;
         WriteLine("********************************************");
         ResetColor();
+
         ShowMainMenu();
     }
 
@@ -89,30 +111,36 @@ public class SecureIQMenu
     public static void ShowMainMenu()
     {
         Clear();
-
+        //calls methood
         Header("Ask me anything about cybersecurity (type 'exit' to quit)");
 
         string input;
-        ResetColor();
-        //give user input
+
+        //do while loop to ensure that the program keeps running until the user types exit
         do
         {
-            ResetColor();
-            ForegroundColor= ConsoleColor.DarkYellow;
+            ForegroundColor = ConsoleColor.DarkYellow;
             Write("> ");
             ResetColor();
+
             input = ReadLine();
 
-            if (input.ToLower() != "exit")
+            // validates the input
+            if (string.IsNullOrWhiteSpace(input))
             {
-                respond.GetResponse(input);
-
-                string botResponse = respond.Ask(input);
-                SaveChat(input, botResponse);
-                
+                ForegroundColor = ConsoleColor.Red;
+                WriteLine("Please enter a valid question.");
+                ResetColor();
+                continue;
             }
 
-        } while (input.ToLower() != "exit");
+            if (!input.Equals("exit", StringComparison.OrdinalIgnoreCase))
+            {
+                string botResponse = respond.Ask(input);
+                SaveChat(input, botResponse);
+            }
+
+        } while (!input.Equals("exit", StringComparison.OrdinalIgnoreCase));
 
         ExitApp();
     }
@@ -120,12 +148,48 @@ public class SecureIQMenu
     // Exit app
     static void ExitApp()
     {
-        Header("Good Bye");
-        ForegroundColor = ConsoleColor.DarkYellow;
-        TypeText($"Thanks for using SecureIQ Africa, {respond.name} ^-^", 50);
-        ResetColor() ;
-        Thread.Sleep(1000);
-        Environment.Exit(0);
+        string choice;
+        Clear();
+        do
+        {
+            //do while loop to ensure thatb the program keeps running until the user types exit
+            Header("Do you really want to exit or return to menu?");
+            ForegroundColor = ConsoleColor.Yellow;
+            WriteLine("1. Exit");
+            WriteLine("2. Return to Menu");
+            ResetColor();
+
+            ForegroundColor = ConsoleColor.DarkYellow;
+            Write("Choose option (1 or 2): ");
+            ResetColor();
+
+            choice = ReadLine();
+
+            // validates the choices
+            if (choice != "1" && choice != "2")
+            {
+                ForegroundColor = ConsoleColor.Red;
+                WriteLine("Invalid choice. Please enter 1 or 2.");
+                ResetColor();
+            }
+
+        } while (choice != "1" && choice != "2");
+
+        //if 2 is chosen the method is called
+        if (choice == "2")
+        {
+            ReturnToMenu();
+        }
+        else
+        {
+            //closes console application
+            Header("Good Bye");
+            ForegroundColor = ConsoleColor.DarkYellow;
+            TypeText($"Thanks for using SecureIQ Africa, {respond.name} ^-^", 50);
+            ResetColor();
+            Thread.Sleep(1000);
+            Environment.Exit(0);
+        }
     }
 
     // return to menu helper 
@@ -141,26 +205,24 @@ public class SecureIQMenu
         ShowMainMenu();
     }
 
-    //save that chat to textfile with
+    // save chat to text file
     static void SaveChat(string userInput, string response)
     {
-        //exeption handeling
         try
         {
-            //time of the interaction
             string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-            //textfile data
             string log =
                  $"[{time}] {respond.name}: {userInput}\n" +
                  $"[{time}] SecureIQ Bot: {response}\n\n";
 
-            //append the file path and the logo
             File.AppendAllText(filePath, log);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Failed to save chat log: " + ex.Message);
+            ForegroundColor = ConsoleColor.Red;
+            WriteLine("Failed to save chat log: " + ex.Message);
+            ResetColor();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace SecureIQ_Africa
 {
     internal class Response
     {
+        //getters and setters
         public string name { get; set; }
 
         // create a new intsance of ResponseData class
