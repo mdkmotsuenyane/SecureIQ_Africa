@@ -1,6 +1,7 @@
 ﻿using SecureIQ_Africa;
 using System;
 using System.IO;
+using System.Media;
 using System.Speech.Synthesis;
 using System.Threading;
 using static System.Console;
@@ -45,6 +46,11 @@ public class SecureIQMenu
     // Welcome Screen
     public static void ShowWelcomeScreen()
     {
+        //welcomes the user with voice
+        SoundPlayer player = new SoundPlayer("C:\\Users\\Lenovo\\source\\repos\\SecureIQ_Africa\\SecureIQ_Africa\\SecureIQ.wav");
+        player.Load();
+        player.Play();
+
         Clear();
         ForegroundColor = ConsoleColor.DarkYellow;
         //prints logo ascii art
@@ -57,13 +63,17 @@ public class SecureIQMenu
         ResetColor();
         TypeText("Welcome to SecureIQ Africa");
 
+        /*
         //message
         string message =
               "Welcome to SecureIQ Africa, your trusted cybersecurity assistant.";
 
         //system voice the welcomes the user
         SpeechSynthesizer voice = new SpeechSynthesizer();
-        voice.Speak(message);
+        voice.Speak(message); */
+
+
+       
 
         // declaration
         string name;
