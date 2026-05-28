@@ -1,0 +1,96 @@
+2026-05-27 10:55:06 - Kholo: what is my name
+2026-05-27 10:55:06 - Bot: Kholo
+2026-05-27 20:09:50 - Mokadi: what is my name
+2026-05-27 20:09:50 - Bot: Mokadi
+2026-05-27 20:10:08 - Mokadi: my favorite topic is password
+2026-05-27 20:10:08 - Bot: password is a string of characters that must be keyed to gain access to a computer, network, or service or to a phone or similar device.
+ Please use strong, unique passwords for every account. Combine uppercase, lowercase, numbers, and symbols.
+2026-05-27 20:10:24 - Mokadi: what about passwords
+2026-05-27 20:10:24 - Bot: password is a string of characters that must be keyed to gain access to a computer, network, or service or to a phone or similar device.
+ Please use strong, unique passwords for every account. Combine uppercase, lowercase, numbers, and symbols.
+2026-05-27 20:50:38 - Mokadi: what is phishing
+2026-05-27 20:50:38 - Bot: Phishing is the fraudulent practice of sending emails or other messages purporting to be from reputable companies in order to induce individuals to reveal personal information, such as passwords and credit card numbers.
+Watch out for emails or messages asking for personal info. When in doubt, don't click links.
+2026-05-27 20:51:03 - Mokadi: my favorite topic is phishing
+2026-05-27 20:51:03 - Bot: Phishing is the fraudulent practice of sending emails or other messages purporting to be from reputable companies in order to induce individuals to reveal personal information, such as passwords and credit card numbers.
+Watch out for emails or messages asking for personal info. When in doubt, don't click links.
+2026-05-27 20:51:19 - Mokadi: i am sad
+2026-05-27 20:51:19 - Bot: Sorry, I don't understand that yet. Try asking about passwords, phishing, malware, or Wi-Fi security.
+2026-05-28 00:11:29 - Lindiwe: yes
+2026-05-28 00:11:29 - Bot: Hmm, I don't know that one. Want to learn about password security or phishing prevention instead?
+2026-05-28 00:21:38 - Remo: what is my name
+2026-05-28 00:21:38 - Bot: Your name is Remo!
+2026-05-28 00:21:54 - Remo: good
+2026-05-28 00:21:54 - Bot: I'm glad you're feeling positive! Remember to keep that energy while staying cyber-safe!
+2026-05-28 00:22:27 - Remo: ibut i'm angry
+2026-05-28 00:22:27 - Bot: I understand your frustration. Security can be annoying, but let's work through it calmly.
+2026-05-28 00:22:40 - Remo: can you help
+2026-05-28 00:22:40 - Bot: You can ask me about passwords, phishing, malware, safe browsing, privacy, and more.
+2026-05-28 00:23:04 - Remo: wifi
+2026-05-28 00:23:04 - Bot: Wifi is a facility allowing computers, smartphones, or other devices to connect to the internet or communicate with one another wirelessly within a particular area.
+Public Wi-Fi can be risky. Avoid online banking or shopping, or use a VPN.
+2026-05-28 00:34:19 - Mandla: i am sad
+2026-05-28 00:34:19 - Bot: I'm sorry you're feeling down. Let me help protect your online world - that might cheer you up!
+2026-05-28 00:34:32 - Mandla: okay
+2026-05-28 00:34:32 - Bot: That's outside my knowledge for now. Would you like to learn about protecting your online accounts instead?
+2026-05-28 00:37:06 - Unathi: what is my name
+2026-05-28 00:37:06 - Bot: Your name is Unathi!
+2026-05-28 00:37:11 - Unathi: ok
+2026-05-28 00:37:11 - Bot: Great! I'm glad that makes sense. Would you like to learn more about cybersecurity topics?
+2026-05-28 00:37:17 - Unathi: no
+2026-05-28 00:37:17 - Bot: I understand. Is there a specific cybersecurity topic you'd like to learn about instead? I'm here to help!
+2026-05-28 00:37:37 - Unathi: just kidding yes
+2026-05-28 00:37:37 - Bot: Sorry, I don't understand that yet. Try asking about passwords, phishing, malware, or Wi-Fi security.
+2026-05-28 00:41:17 - Rasta: what is my name
+2026-05-28 00:41:17 - Bot: Your name is Rasta!
+2026-05-28 00:41:24 - Rasta: okay
+2026-05-28 00:41:24 - Bot: Great! I'm glad that makes sense. Would you like to learn more about cybersecurity topics?
+2026-05-28 00:41:33 - Rasta: yes
+2026-05-28 00:41:33 - Bot: Excellent! I'm happy to help. What specific cybersecurity topic would you like to explore further?
+2026-05-28 00:41:44 - Rasta: phishing
+2026-05-28 00:41:44 - Bot: Phishing is the fraudulent practice of sending emails or other messages purporting to be from reputable companies in order to induce individuals to reveal personal information, such as passwords and credit card numbers.
+Watch out for emails or messages asking for personal info. When in doubt, don't click links.
+2026-05-28 00:42:04 - Rasta: pshing is my favorite topic
+2026-05-28 00:42:04 - Bot: I'm not sure about that. Feel free to ask me about online safety, data privacy, or secure browsing!
+2026-05-28 00:42:25 - Rasta: phishing is my favorite topic
+2026-05-28 00:42:25 - Bot: Phishing is the fraudulent practice of sending emails or other messages purporting to be from reputable companies in order to induce individuals to reveal personal information, such as passwords and credit card numbers.
+Watch out for emails or messages asking for personal info. When in doubt, don't click links.
+2026-05-28 01:01:29 - Valencia: What is my name
+2026-05-28 01:01:30 - Bot: Your name is Valencia!
+2026-05-28 01:02:01 - Valencia: my favorite topic is wifi
+2026-05-28 01:02:01 - Bot: Wifi is a facility allowing computers, smartphones, or other devices to connect to the internet or communicate with one another wirelessly within a particular area.
+Public Wi-Fi can be risky. Avoid online banking or shopping, or use a VPN.
+
+Would you like me to share some tips about this?
+2026-05-28 01:02:07 - Valencia: yes
+2026-05-28 01:02:07 - Bot: Excellent! I'm happy to help. What specific cybersecurity topic would you like to explore further?
+2026-05-28 01:03:59 - th: ii
+2026-05-28 01:03:59 - Bot: Sorry, I don't understand that yet. Try asking about passwords, phishing, malware, or Wi-Fi security.
+2026-05-28 01:05:18 - jas: t
+2026-05-28 01:05:18 - Bot: Hmm, I don't know that one. Want to learn about password security or phishing prevention instead?
+2026-05-28 01:06:46 - Humberto: the
+2026-05-28 01:06:46 - Bot: That's outside my knowledge for now. Would you like to learn about protecting your online accounts instead?
+2026-05-28 01:08:12 - Oratile: th
+2026-05-28 01:08:12 - Bot: I'm still learning! Could you ask about cybersecurity topics like 2FA, VPNs, or safe browsing instead?
+2026-05-28 01:10:44 - Yamcha: i hate
+2026-05-28 01:10:44 - Bot: I understand your frustration. Security can be annoying, but let's work through it calmly.
+2026-05-28 01:10:52 - Yamcha: okay
+2026-05-28 01:10:52 - Bot: Great! I'm glad that makes sense. Would you like to learn more about cybersecurity topics?
+2026-05-28 01:12:41 - Mandla: i hate
+2026-05-28 01:12:41 - Bot: I understand your frustration. Security can be annoying, but let's work through it calmly.
+2026-05-28 01:12:48 - Mandla: okay
+2026-05-28 01:12:48 - Bot: Great! I'm glad that makes sense. Would you like to learn more about cybersecurity topics?
+2026-05-28 01:18:37 - Thato: hwlp
+2026-05-28 01:18:37 - Bot: That's outside my knowledge for now. Would you like to learn about protecting your online accounts instead?
+2026-05-28 01:18:45 - Thato: help
+2026-05-28 01:18:45 - Bot: You can ask me about passwords, phishing, malware, safe browsing, privacy, and more.
+
+Would you like me to share some tips about this?
+2026-05-28 01:18:50 - Thato: yes
+2026-05-28 01:18:50 - Bot: Excellent! I'm happy to help. What specific cybersecurity topic would you like to explore further?
+2026-05-28 01:19:03 - Thato: okay
+2026-05-28 01:19:03 - Bot: Great! I'm glad that makes sense. Would you like to learn more about cybersecurity topics?
+2026-05-28 01:19:13 - Thato: hate
+2026-05-28 01:19:13 - Bot: I understand your frustration. Security can be annoying, but let's work through it calmly.
+2026-05-28 01:19:21 - Thato: okay
+2026-05-28 01:19:21 - Bot: Great! I'm glad that makes sense. Would you like to learn more about cybersecurity topics?
