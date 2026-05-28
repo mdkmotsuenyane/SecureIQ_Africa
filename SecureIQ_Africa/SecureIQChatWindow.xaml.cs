@@ -39,11 +39,21 @@ namespace SecureIQ_Africa
             // Set the username properly using the method
             responseHandler.SetUserName(username);
 
+            // Ensure History directory exists
+            try
+            {
+                Directory.CreateDirectory("History");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating History directory: {ex.Message}");
+            }
+
             Greeting();
         }
 
         //voice greeting system 
-        public void Greeting()
+        private async void Greeting()
         {
             try
             {
@@ -72,11 +82,12 @@ namespace SecureIQ_Africa
                 greeting = $"Welcome, {username}! We are here to answer your cybersecurity-related questions.";
             }
 
+            await TypingAnimation();
             BotMessage(greeting);
         }
 
         //events that happen after the button is clicked 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -93,6 +104,9 @@ namespace SecureIQ_Africa
                 // Save to history
                 SaveMessage(username, userMessage);
                 isStored = true;
+
+                // Call typing effect
+                await TypingAnimation();
 
                 // Get and display bot response
                 string response = responseHandler.GetResponse(userMessage);
@@ -114,7 +128,7 @@ namespace SecureIQ_Africa
         //Bot Message 
         public void BotMessage(string message)
         {
-            
+
             Dispatcher.Invoke(() =>
             {
                 StackPanel stack = new StackPanel();
@@ -231,13 +245,26 @@ namespace SecureIQ_Africa
         {
             try
             {
+                // Ensure directory exists before saving
                 Directory.CreateDirectory("History");
+
                 string line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {user}: {message}";
                 File.AppendAllText(historyFile, line + Environment.NewLine);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error saving message: {ex.Message}");
+                // Try alternative location if primary fails
+                try
+                {
+                    string fallbackFile = "chat_history_backup.txt";
+                    string line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {user}: {message}";
+                    File.AppendAllText(fallbackFile, line + Environment.NewLine);
+                }
+                catch
+                {
+                    // Silently fail if even backup fails
+                }
             }
         }
 
@@ -250,7 +277,7 @@ namespace SecureIQ_Africa
             }
         }
 
-        // TYPING EFFECT - Added this method
+        // Typing effect 
         private async Task TypingAnimation()
         {
             Border typingBorder = new Border()
@@ -264,7 +291,7 @@ namespace SecureIQ_Africa
 
             TextBlock typingText = new TextBlock()
             {
-                Text = username + " is Typing...",
+                Text = "🤖 is Typing...",
                 Foreground = Brushes.Black
             };
 

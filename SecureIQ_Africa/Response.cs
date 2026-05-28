@@ -6,76 +6,103 @@ namespace SecureIQ_Africa
 {
     public class Response
     {
-        // Properties
         public string name { get; set; }
 
-        // Fields
         private SecureData data = new SecureData();
         private Memory memory = new Memory();
         private ResponseTips tips = new ResponseTips();
-        private string lastTopic = null;
+        private string currentTopic = null;
         private int followUpCount = 0;
+        private string expectedResponse = null;
+        private string lastQuestion = null;
+        private int consecutiveUnknownResponses = 0;
+        private int consecutiveNoCount = 0;
+        private bool conversationEnded = false;
+        private string askingWhatsWrongFor = null;
         private Dictionary<string, string> responseCache = new Dictionary<string, string>();
         private static readonly Random random = new Random();
 
-        // Fallback responses for variety
+        // Synonym mapping for topics
+        private Dictionary<string, string[]> topicSynonyms = new Dictionary<string, string[]>()
+        {
+            { "password", new[] { "password", "pass", "login", "credential", "account access", "passwords", "password safety" } },
+            { "phishing", new[] { "phishing", "scam", "scams", "fake email", "suspicious link", "fraud", "fraudulent", "spoof", "phish" } },
+            { "malware", new[] { "malware", "virus", "viruses", "trojan", "ransomware", "spyware", "malicious" } },
+            { "wifi", new[] { "wifi", "wi-fi", "wireless", "network", "hotspot", "router", "internet" } },
+            { "vpn", new[] { "vpn", "virtual private network", "encryption", "private network" } },
+            { "2fa", new[] { "2fa", "two factor", "two-factor", "authentication", "mfa", "multi factor", "2 factor" } },
+            { "privacy", new[] { "privacy", "personal data", "data protection", "gdpr", "private" } },
+            { "backup", new[] { "backup", "restore", "data loss", "recovery", "back up" } }
+        };
+
         private string[] fallbackResponses = new[]
         {
-            "Sorry, I don't understand that yet. Try asking about passwords, phishing, malware, or Wi-Fi security.",
-            "I'm still learning! Could you ask about cybersecurity topics like 2FA, VPNs, or safe browsing instead?",
-            "Hmm, I don't know that one. Want to learn about password security or phishing prevention instead?",
-            "I'm not sure about that. Feel free to ask me about online safety, data privacy, or secure browsing!",
-            "That's outside my knowledge for now. Would you like to learn about protecting your online accounts instead?"
+            "I want to help you learn about cybersecurity. Could you ask me about specific topics like passwords, phishing, malware, or WiFi security?",
+            "I'm here to help with cybersecurity questions. Try asking me about creating strong passwords, spotting phishing emails, or protecting your home WiFi.",
+            "Let me help you stay safe online. What would you like to know about - password security, online privacy, or how to avoid scams?",
+            "I specialize in cybersecurity awareness. You can ask me about 2FA, VPNs, safe browsing, or data backups. What interests you?"
         };
 
-        // Confusion detection phrases
         private string[] confusionPhrases = new[]
         {
-            "i don't understand",
-            "confused",
-            "explain simply",
-            "too technical",
-            "simpler terms",
-            "i'm lost",
-            "not clear",
-            "what do you mean",
-            "huh",
-            "what",
-            "come again"
+            "i don't understand", "confused", "explain simply", "too technical",
+            "simpler terms", "i'm lost", "not clear", "what do you mean", "huh", "what", "come again"
         };
 
-        // Constructor
+        private string[] dismissalPhrases = new[]
+        {
+            "it is fine", "it's fine", "that's fine", "nevermind", "never mind",
+            "forget it", "skip it", "don't worry", "it's okay", "its okay",
+            "that's okay", "no worries", "all good"
+        };
+
+        private string[] farewellPhrases = new[]
+        {
+            "goodbye", "bye", "quit", "exit", "i quit", "i'm done", "im done",
+            "that's all", "no more", "stop", "end", "bye bye", "see you", "later"
+        };
+
+        private string[] gratitudePhrases = new[]
+        {
+            "thank you", "thanks", "thx", "appreciate it", "thank", "ty", "thanks a lot"
+        };
+
+        private string[] acknowledgmentAfterGoodbye = new[]
+        {
+            "okay", "ok", "k", "got it", "alright", "fine", "sure", "yeah", "yes"
+        };
+
+        private string[] questionWords = new[]
+        {
+            "why", "how", "what", "when", "where", "who", "which", "can you", "could you", "please explain"
+        };
+
         public Response()
         {
             name = null;
         }
 
-        // Set user name
         public void SetUserName(string userName)
         {
             name = userName;
             memory.SetUserName(userName);
         }
 
-        // Get user name
         public string GetUserName()
         {
             return name ?? memory.GetUserName();
         }
 
-        // Check if user name is set
         public bool HasUserName()
         {
             return GetUserName() != null;
         }
 
-        // Get personalized greeting
         public string GetPersonalizedGreeting()
         {
             return memory.GetPersonalizedGreeting();
         }
 
-        // Helper method to check if a word appears as a whole word
         private bool IsWholeWord(string text, string word)
         {
             int index = text.IndexOf(word, StringComparison.OrdinalIgnoreCase);
@@ -87,14 +114,12 @@ namespace SecureIQ_Africa
             return beforeOk && afterOk;
         }
 
-        // Split input into words
         private string[] SplitWords(string input)
         {
             return input.Split(new char[] { ' ', '\t', '\r', '\n' },
                                StringSplitOptions.RemoveEmptyEntries);
         }
 
-        // Helper method to sanitize input
         private string SanitizeInput(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
@@ -104,346 +129,1126 @@ namespace SecureIQ_Africa
             return input.Trim();
         }
 
-        // Check if user is expressing confusion
         private bool IsUserConfused(string input)
         {
             string lowerInput = input.ToLower();
             return confusionPhrases.Any(phrase => lowerInput.Contains(phrase));
         }
 
-        // Check if user wants another tip
+        private bool IsDismissal(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return dismissalPhrases.Any(phrase => lowerInput.Contains(phrase));
+        }
+
+        private bool IsFarewell(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return farewellPhrases.Any(phrase => lowerInput.Contains(phrase));
+        }
+
+        private bool IsGratitude(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return gratitudePhrases.Any(phrase => lowerInput.Contains(phrase));
+        }
+
+        private bool IsAcknowledgmentAfterGoodbye(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return acknowledgmentAfterGoodbye.Any(phrase => lowerInput == phrase || lowerInput.Contains(phrase));
+        }
+
+        private bool IsQuestionWord(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return questionWords.Any(phrase => lowerInput == phrase || lowerInput.StartsWith(phrase));
+        }
+
         private bool WantsAnotherTip(string input)
         {
             string lowerInput = input.ToLower();
-            return lowerInput.Contains("another tip") ||
-                   lowerInput.Contains("more tips") ||
-                   lowerInput.Contains("give me another") ||
-                   lowerInput.Contains("another one") ||
-                   lowerInput.Contains("more advice") ||
-                   lowerInput.Contains("another suggestion");
+            return lowerInput.Contains("another tip") || lowerInput.Contains("more tips") ||
+                   lowerInput.Contains("give me another") || lowerInput.Contains("another one") ||
+                   lowerInput.Contains("more advice") || lowerInput.Contains("another suggestion");
         }
 
-        // Check if user wants to continue current topic
-        private bool WantsToContinue(string input)
+        private bool IsAffirmativeResponse(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return lowerInput == "yes" || lowerInput == "yeah" || lowerInput == "yep" ||
+                   lowerInput == "sure" || lowerInput == "ok" || lowerInput == "okay" ||
+                   lowerInput == "please" || lowerInput == "yeah sure" || lowerInput == "y" ||
+                   lowerInput == "sure thing" || lowerInput == "definitely" || lowerInput == "absolutely" ||
+                   lowerInput == "yes!" || lowerInput == "yeah!" || lowerInput == "sure!" ||
+                   lowerInput == "ok!" || lowerInput == "k" || lowerInput == "kk" ||
+                   lowerInput == "alright" || lowerInput == "alrighty" || lowerInput == "fine" ||
+                   lowerInput == "got it" || lowerInput == "understood" || lowerInput == "correct";
+        }
+
+        private bool IsNegativeResponse(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return lowerInput == "no" || lowerInput == "nope" || lowerInput == "not really" ||
+                   lowerInput == "no thanks" || lowerInput == "nah" || lowerInput == "no!" ||
+                   lowerInput == "nope!" || lowerInput == "not interested";
+        }
+
+        private bool IsConversationEnding(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return lowerInput == "maybe later" || lowerInput == "not now" || lowerInput == "pass" ||
+                   lowerInput == "no way" || lowerInput == "negative" || lowerInput == "nevermind" ||
+                   lowerInput == "never mind" || lowerInput.Contains("don't want") ||
+                   lowerInput == "i'm done" || lowerInput == "im done" || lowerInput == "that's all";
+        }
+
+        private bool IsGreeting(string input)
+        {
+            string lowerInput = input.ToLower().Trim();
+            return lowerInput == "hi" || lowerInput == "hello" || lowerInput == "hey" ||
+                   lowerInput == "good morning" || lowerInput == "good afternoon" || lowerInput == "good evening" ||
+                   lowerInput == "hi there" || lowerInput == "hello there";
+        }
+
+        private bool IsHelpRequest(string input)
         {
             string lowerInput = input.ToLower();
-            return lowerInput.Contains("tell me more") ||
-                   lowerInput.Contains("elaborate") ||
-                   lowerInput.Contains("explain further") ||
-                   lowerInput.Contains("go on") ||
-                   lowerInput.Contains("continue") ||
-                   lowerInput.Contains("and then?") ||
-                   lowerInput.Contains("what else") ||
-                   lowerInput.Contains("more about") ||
-                   lowerInput.Contains("keep going");
+            return lowerInput == "help" || lowerInput == "what can you do" ||
+                   lowerInput.Contains("what can i ask") || lowerInput.Contains("how do you work") ||
+                   lowerInput == "commands";
         }
 
-        // Handle memory recall requests
-        private string HandleMemoryRecall(string userInput)
+        private bool IsNameQuestion(string input)
         {
-            string normalizedInput = userInput.ToLower();
+            string lowerInput = input.ToLower().Trim();
+            return lowerInput.Contains("what is my name") || lowerInput.Contains("do you know my name") ||
+                   lowerInput.Contains("my name") || lowerInput == "what's my name";
+        }
 
-            // Check if user wants to recall something from memory
+        private bool IsEmptyOrGibberish(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return true;
+            string trimmed = input.Trim();
+            if (trimmed.Length <= 2 && !IsAffirmativeResponse(trimmed) && !IsNegativeResponse(trimmed))
+                return true;
+            return false;
+        }
+
+        private string DetectTopicFromSynonyms(string userInput)
+        {
+            if (string.IsNullOrWhiteSpace(userInput)) return null;
+
+            string lowerInput = userInput.ToLower().Trim();
+
+            foreach (var topic in topicSynonyms)
+            {
+                foreach (string synonym in topic.Value)
+                {
+                    if (lowerInput.Contains(synonym))
+                    {
+                        return topic.Key;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private string DetectSentiment(string userInput)
+        {
+            string lowerInput = userInput.ToLower();
+
+            // Angry detection
+            if (lowerInput.Contains("angry") || lowerInput.Contains("frustrated") ||
+                lowerInput.Contains("annoying") || lowerInput.Contains("hate") ||
+                lowerInput.Contains("stupid") || lowerInput.Contains("makes me angry") ||
+                lowerInput.Contains("i'm angry") || lowerInput.Contains("im angry") ||
+                lowerInput.Contains("pissed") || lowerInput.Contains("mad"))
+            {
+                return "angry";
+            }
+
+            // Worried detection
+            if (lowerInput.Contains("worried") || lowerInput.Contains("anxious") ||
+                lowerInput.Contains("nervous") || lowerInput.Contains("scared") ||
+                lowerInput.Contains("fear") || lowerInput.Contains("unsafe") ||
+                lowerInput.Contains("stressed") || lowerInput.Contains("overwhelmed") ||
+                lowerInput.Contains("concerned") || lowerInput.Contains("afraid"))
+            {
+                return "worried";
+            }
+
+            // Frustrated detection
+            if (lowerInput.Contains("frustrated") || lowerInput.Contains("confusing") ||
+                lowerInput.Contains("too hard") || lowerInput.Contains("difficult") ||
+                lowerInput.Contains("tired of") || lowerInput.Contains("exhausted") ||
+                lowerInput.Contains("annoyed"))
+            {
+                return "frustrated";
+            }
+
+            // Sad detection
+            if (lowerInput.Contains("sad") || lowerInput.Contains("depressed") ||
+                lowerInput.Contains("upset") || lowerInput.Contains("unhappy") ||
+                lowerInput.Contains("terrible") || lowerInput.Contains("awful") ||
+                lowerInput.Contains("miserable"))
+            {
+                return "sad";
+            }
+
+            // Happy detection
+            if (lowerInput.Contains("happy") || lowerInput.Contains("excited") ||
+                lowerInput.Contains("great") || lowerInput.Contains("awesome") ||
+                lowerInput.Contains("wonderful") || lowerInput.Contains("fantastic") ||
+                lowerInput.Contains("good") || lowerInput.Contains("amazing"))
+            {
+                return "happy";
+            }
+
+            // Curious detection
+            if (lowerInput.Contains("curious") || lowerInput.Contains("interesting") ||
+                lowerInput.Contains("tell me more") || lowerInput.Contains("want to learn") ||
+                lowerInput.Contains("how does") || lowerInput.Contains("why is") ||
+                lowerInput.Contains("what is") || lowerInput.Contains("explain"))
+            {
+                return "curious";
+            }
+
+            // Confident detection
+            if (lowerInput.Contains("got it") || lowerInput.Contains("understand") ||
+                lowerInput.Contains("makes sense") || lowerInput.Contains("clear") ||
+                lowerInput.Contains("i see") || lowerInput.Contains("thanks") ||
+                lowerInput.Contains("thank you"))
+            {
+                return "confident";
+            }
+
+            return "neutral";
+        }
+
+        private string GetEmpatheticResponseForEmotion(string emotion, string topic = null)
+        {
+            string userName = GetUserName();
+            string namePrefix = string.IsNullOrEmpty(userName) ? "" : $"{userName}, ";
+
+            switch (emotion)
+            {
+                case "angry":
+                    if (!string.IsNullOrEmpty(topic))
+                        return $"{namePrefix}I understand that dealing with {topic} can be really frustrating. Let me share something that might help.\n\n";
+                    else
+                        return $"{namePrefix}I'm sorry to hear that you're feeling angry. ";
+
+                case "worried":
+                    if (!string.IsNullOrEmpty(topic))
+                        return $"{namePrefix}It's completely understandable to feel worried about {topic}. Your concern shows you care about your security! Let me share some practical tips.\n\n";
+                    else
+                        return $"{namePrefix}I'm sorry you're feeling worried. ";
+
+                case "frustrated":
+                    if (!string.IsNullOrEmpty(topic))
+                        return $"{namePrefix}I hear your frustration - {topic} can definitely be complicated. You're not alone. Let me break this down simply.\n\n";
+                    else
+                        return $"{namePrefix}I understand cybersecurity can be frustrating. ";
+
+                case "sad":
+                    if (!string.IsNullOrEmpty(topic))
+                        return $"{namePrefix}I'm sorry {topic} is making you feel this way. Let me share something that might help improve the situation.\n\n";
+                    else
+                        return $"{namePrefix}I'm sorry you're feeling down. ";
+
+                case "happy":
+                    if (!string.IsNullOrEmpty(topic))
+                        return $"{namePrefix}That's great that you're excited about {topic}! Let me share something interesting.\n\n";
+                    else
+                        return $"{namePrefix}I'm glad you're feeling positive! ";
+
+                case "curious":
+                    if (!string.IsNullOrEmpty(topic))
+                        return $"{namePrefix}Great curiosity about {topic}! Let me share something interesting.\n\n";
+                    else
+                        return $"{namePrefix}Great curiosity! Cybersecurity is fascinating. ";
+
+                case "confident":
+                    if (!string.IsNullOrEmpty(topic))
+                        return $"{namePrefix}Excellent! You're on the right track with {topic}. Here's something valuable to add.\n\n";
+                    else
+                        return $"{namePrefix}Excellent! You're doing great. ";
+
+                default:
+                    return "";
+            }
+        }
+
+        private string GetFollowUpQuestionForEmotion(string emotion)
+        {
+            switch (emotion)
+            {
+                case "angry":
+                    return "What's wrong? I'm here to help with any cybersecurity concerns you have.";
+                case "worried":
+                    return "What specific cybersecurity concern do you have? I'm here to help.";
+                case "frustrated":
+                    return "What specifically is bothering you? Let me try to help.";
+                case "sad":
+                    return "What's making you feel this way? I'd like to help if I can.";
+                case "happy":
+                    return "Would you like to learn more about cybersecurity today?";
+                case "curious":
+                    return "What would you like to learn about?";
+                case "confident":
+                    return "Would you like to test your knowledge or learn something new?";
+                default:
+                    return "How can I help you with cybersecurity today?";
+            }
+        }
+
+        private string GetResponseForTopic(string topic)
+        {
+            string baseResponse = "";
+            foreach (var item in data.secureData)
+            {
+                if (item.Key == topic)
+                {
+                    baseResponse = item.Value.response;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(baseResponse))
+            {
+                baseResponse = $"Let me help you learn about {topic} security.";
+            }
+
+            string tip = tips.GetRandomTip(topic, 0);
+            string personalizedTip = memory.GetPersonalizedResponse(topic, tip);
+
+            currentTopic = topic;
+            followUpCount = 1;
+            expectedResponse = "learn_more";
+            consecutiveUnknownResponses = 0;
+            consecutiveNoCount = 0;
+            conversationEnded = false;
+
+            return $"{baseResponse}\n\nHere's a helpful tip:\n{personalizedTip}\n\nWould you like to learn more about {topic}?";
+        }
+
+        private string HandleMemoryOperations(string userInput)
+        {
+            string normalizedInput = userInput.ToLower().Trim();
+
+            // Check for name question FIRST - HIGHEST PRIORITY
+            if (IsNameQuestion(userInput))
+            {
+                if (!string.IsNullOrEmpty(GetUserName()))
+                {
+                    return $"Your name is {GetUserName()}! I remember you told me earlier.";
+                }
+                return "I don't know your name yet. Could you please tell me?";
+            }
+
+            // Store favorite topic - IMPROVED DETECTION
+            bool isFavoriteTopic = normalizedInput.Contains("my favorite topic") ||
+                                   normalizedInput.Contains("favorite topic is") ||
+                                   normalizedInput.Contains("is my favorite topic") ||
+                                   normalizedInput.Contains("favorite topic") ||
+                                   normalizedInput.Contains("i love") ||
+                                   normalizedInput.Contains("i like") ||
+                                   (normalizedInput.Contains("interested in") && !normalizedInput.Contains("what is"));
+
+            if (isFavoriteTopic)
+            {
+                string topic = DetectTopicFromSynonyms(normalizedInput);
+
+                // Manual checks for common topics
+                if (topic == null && (normalizedInput.Contains("password safety") || normalizedInput.Contains("password")))
+                {
+                    topic = "password";
+                }
+                if (topic == null && (normalizedInput.Contains("phishing") || normalizedInput.Contains("scam")))
+                {
+                    topic = "phishing";
+                }
+                if (topic == null && (normalizedInput.Contains("wifi") || normalizedInput.Contains("wi-fi")))
+                {
+                    topic = "wifi";
+                }
+                if (topic == null && (normalizedInput.Contains("malware") || normalizedInput.Contains("virus")))
+                {
+                    topic = "malware";
+                }
+                if (topic == null && (normalizedInput.Contains("vpn") || normalizedInput.Contains("virtual private")))
+                {
+                    topic = "vpn";
+                }
+                if (topic == null && (normalizedInput.Contains("2fa") || normalizedInput.Contains("two factor")))
+                {
+                    topic = "2fa";
+                }
+                if (topic == null && normalizedInput.Contains("privacy"))
+                {
+                    topic = "privacy";
+                }
+                if (topic == null && normalizedInput.Contains("backup"))
+                {
+                    topic = "backup";
+                }
+
+                if (topic != null)
+                {
+                    memory.StoreUserPreference("favorite_topic", topic);
+                    currentTopic = topic;
+                    expectedResponse = "learn_more";
+                    lastQuestion = $"Would you like to learn more about {topic}?";
+                    consecutiveUnknownResponses = 0;
+                    consecutiveNoCount = 0;
+                    conversationEnded = false;
+                    askingWhatsWrongFor = null;
+
+                    string tip = tips.GetRandomTip(topic, 0);
+                    if (string.IsNullOrWhiteSpace(tip))
+                    {
+                        tip = "Would you like me to share specific security tips about this topic?";
+                    }
+
+                    return $"Great! I'll remember that you're interested in {topic}. It's a crucial part of staying safe online.\n\n" +
+                           $"As someone interested in {topic}, here's a helpful tip:\n{tip}\n\n" +
+                           $"{lastQuestion}";
+                }
+            }
+
+            // Recall from memory
             if (memory.IsAskingToRecall(userInput))
             {
                 string recalledInfo = memory.Recall(userInput);
                 if (recalledInfo != null)
                 {
+                    expectedResponse = null;
+                    consecutiveUnknownResponses = 0;
+                    consecutiveNoCount = 0;
+                    conversationEnded = false;
                     return recalledInfo;
                 }
                 return "I remember our conversation! What specific information would you like me to recall?";
             }
 
-            // Check for conversation summary request
-            if (normalizedInput.Contains("summary") ||
-                normalizedInput.Contains("conversation so far") ||
+            // Conversation summary
+            if (normalizedInput.Contains("summary") || normalizedInput.Contains("conversation so far") ||
                 normalizedInput.Contains("what did we talk about"))
             {
+                expectedResponse = null;
+                consecutiveUnknownResponses = 0;
+                consecutiveNoCount = 0;
+                conversationEnded = false;
                 return memory.GetConversationSummary();
             }
 
-            // Check for favorite topics recall
-            if (normalizedInput.Contains("what do i like") ||
-                normalizedInput.Contains("my interests") ||
-                normalizedInput.Contains("topics i ask about") ||
-                normalizedInput.Contains("what have i asked"))
+            // Favorite topics recall
+            if (normalizedInput.Contains("what do i like") || normalizedInput.Contains("my interests") ||
+                normalizedInput.Contains("topics i ask about") || normalizedInput.Contains("what have i asked") ||
+                normalizedInput.Contains("what is my favorite topic"))
             {
                 var favorites = memory.GetFavoriteTopics();
-                if (favorites.Any())
+                string favTopic = memory.GetUserPreference("favorite_topic");
+                expectedResponse = null;
+                consecutiveUnknownResponses = 0;
+                consecutiveNoCount = 0;
+                conversationEnded = false;
+
+                if (!string.IsNullOrEmpty(favTopic))
+                {
+                    return $"You told me you're interested in {favTopic}. " +
+                           (favorites.Any() ? $"You've also shown interest in {string.Join(", ", favorites.Where(f => f != favTopic).Take(2))}." : "") +
+                           " Would you like to learn more about any of these topics?";
+                }
+                else if (favorites.Any())
                 {
                     return $"You've shown interest in: {string.Join(", ", favorites)}. Would you like to learn more about any of these?";
                 }
                 return "You haven't asked about any specific topics yet. Try asking me about passwords, phishing, or malware!";
             }
 
-            // Check for last question recall
-            if (normalizedInput.Contains("last question") ||
-                normalizedInput.Contains("previous question") ||
-                normalizedInput.Contains("what did i just ask"))
-            {
-                var recentHistory = memory.GetRecentHistory(2);
-                if (recentHistory.Count > 0)
-                {
-                    return $"Your last question was about: {recentHistory.Last()}. Would you like me to elaborate?";
-                }
-            }
-
             return null;
         }
 
-        // Get another random tip for the current topic
-        private string GetAnotherTip()
+        private string ProvideTip(string topic, bool askForAnother = true)
         {
-            if (string.IsNullOrEmpty(lastTopic))
-                return null;
+            string tip = tips.GetRandomTip(topic, followUpCount);
+            string personalizedTip = memory.GetPersonalizedResponse(topic, tip);
+            followUpCount++;
 
-            string tip = tips.GetRandomTip(lastTopic, followUpCount);
-            if (tip != null)
+            if (askForAnother)
             {
-                followUpCount++;
-                return tip;
+                expectedResponse = "another_tip";
+                lastQuestion = "Would you like another tip?";
+                consecutiveUnknownResponses = 0;
+                consecutiveNoCount = 0;
+                conversationEnded = false;
+                return $"{personalizedTip}\n\n{lastQuestion}";
             }
-            return null;
-        }
-
-        // Get simplified explanation for confused users
-        private string GetSimplifiedExplanation(string topic)
-        {
-            switch (topic)
+            else
             {
-                case "password":
-                    return "Let me explain simply: A strong password is like a good lock on your front door. Make it long (12+ characters), mix letters and numbers, and never use the same lock for every door (don't reuse passwords). Simple enough?";
-                case "phishing":
-                    return "Think of phishing like a fake phone call from someone pretending to be your bank. Scammers send fake emails or messages trying to trick you into giving them your info. Always check who's really asking! Make sense?";
-                case "malware":
-                    return "Malware is like a computer virus - it's bad software that can damage your device or steal your info. Just like you avoid touching dirty things, avoid downloading suspicious files. Does that help explain it?";
-                case "vpn":
-                    return "A VPN is like a secret tunnel for your internet traffic. It hides what you're doing online from others, especially on public WiFi. Think of it as a privacy cloak for your computer. Is that clearer?";
-                case "2fa":
-                    return "2FA is like having both a key AND a code to open a safe. Even if someone steals your key (password), they still need the code (from your phone) to get in. It's an extra security step. Understand better now?";
-                default:
-                    return $"Let me explain {topic} in simpler terms. What specific part confuses you?";
+                expectedResponse = null;
+                consecutiveUnknownResponses = 0;
+                consecutiveNoCount = 0;
+                conversationEnded = false;
+                return personalizedTip;
             }
         }
 
-        // Get response based on user input
+        private string GetTopicSuggestions()
+        {
+            string favTopic = memory.GetUserPreference("favorite_topic");
+            expectedResponse = "topic_selection";
+            consecutiveUnknownResponses = 0;
+            conversationEnded = false;
+
+            if (!string.IsNullOrEmpty(favTopic))
+            {
+                return $"Since you're interested in {favTopic}, would you like to learn more about {favTopic}? Or I can suggest another topic like passwords, phishing, or malware protection.";
+            }
+
+            return "What cybersecurity topic would you like to learn about? I can help with:\n" +
+                   "- Password security\n" +
+                   "- Phishing detection (spotting scams and fake emails)\n" +
+                   "- Malware protection\n" +
+                   "- WiFi security\n" +
+                   "- VPNs and privacy\n" +
+                   "- Two-factor authentication (2FA)\n\n" +
+                   "Just ask me about any of these topics!";
+        }
+
+        private string GetFarewellResponse()
+        {
+            conversationEnded = true;
+            expectedResponse = null;
+            currentTopic = null;
+            followUpCount = 0;
+            lastQuestion = null;
+            consecutiveNoCount = 0;
+
+            string userName = GetUserName();
+            if (!string.IsNullOrEmpty(userName))
+            {
+                string[] farewells = {
+                    $"Goodbye {userName}! Stay safe online. Feel free to come back anytime you have cybersecurity questions.",
+                    $"Take care {userName}! Remember to keep your software updated and use strong passwords.",
+                    $"See you later {userName}! Stay vigilant against online threats."
+                };
+                return farewells[random.Next(farewells.Length)];
+            }
+
+            string[] genericFarewells = {
+                "Goodbye! Stay safe online. Feel free to return anytime you have cybersecurity questions.",
+                "Take care! Remember to use strong passwords and enable 2FA where possible.",
+                "See you later! Stay vigilant against phishing emails and suspicious links."
+            };
+            return genericFarewells[random.Next(genericFarewells.Length)];
+        }
+
+        private string GetGratitudeResponse()
+        {
+            conversationEnded = false;
+            string userName = GetUserName();
+            if (!string.IsNullOrEmpty(userName))
+            {
+                string[] thanks = {
+                    $"You're welcome {userName}! I'm glad I could help. Would you like to learn about another topic?",
+                    $"Happy to help, {userName}! Is there another cybersecurity topic you'd like to explore?",
+                    $"Anytime, {userName}! Feel free to ask if you have more cybersecurity questions."
+                };
+                return thanks[random.Next(thanks.Length)];
+            }
+
+            string[] genericThanks = {
+                "You're welcome! I'm glad I could help. Would you like to learn about another topic?",
+                "Happy to help! Is there another cybersecurity topic you'd like to explore?",
+                "Anytime! Feel free to ask if you have more cybersecurity questions."
+            };
+            return genericThanks[random.Next(genericThanks.Length)];
+        }
+
+        private string GetFinalGoodbye()
+        {
+            conversationEnded = true;
+            expectedResponse = null;
+            currentTopic = null;
+            followUpCount = 0;
+            lastQuestion = null;
+            consecutiveNoCount = 0;
+
+            string userName = GetUserName();
+            if (!string.IsNullOrEmpty(userName))
+            {
+                return $"Alright {userName}, no problem! I'll be here if you want to learn about cybersecurity later. Stay safe online!";
+            }
+            return "Alright, no problem! I'll be here if you want to learn about cybersecurity later. Stay safe online!";
+        }
+
+        private string GetPostGoodbyeAcknowledgment()
+        {
+            string[] responses = {
+                "Take care!",
+                "Stay safe online!",
+                "Have a great day!",
+                "I'll be here when you're ready to learn more about cybersecurity.",
+                "Remember to stay vigilant online!"
+            };
+            return responses[random.Next(responses.Length)];
+        }
+
+        private string GetQuestionResponse(string question)
+        {
+            string lowerQuestion = question.ToLower();
+
+            if (lowerQuestion == "why" || lowerQuestion.Contains("why"))
+            {
+                string[] whyResponses = {
+                    "Cybersecurity is important because it protects your personal information, financial data, and privacy from criminals who want to steal or harm.",
+                    "Staying safe online matters because hackers and scammers are constantly looking for ways to exploit vulnerabilities.",
+                    "A single security breach could lead to identity theft, financial loss, or unauthorized access to your accounts."
+                };
+                return whyResponses[random.Next(whyResponses.Length)] + " Would you like to learn more about a specific security topic?";
+            }
+
+            if (lowerQuestion.Contains("how"))
+            {
+                return "You can protect yourself by using strong passwords, enabling two-factor authentication, keeping software updated, and being cautious with suspicious emails. Would you like tips on a specific area?";
+            }
+
+            if (lowerQuestion.Contains("what"))
+            {
+                return GetTopicSuggestions();
+            }
+
+            return "That's a great question! Could you tell me more specifically what you'd like to know about cybersecurity?";
+        }
+
         public string GetResponse(string userInput)
         {
-            // Sanitize input
             userInput = SanitizeInput(userInput);
 
-            // Check if input is empty
-            if (string.IsNullOrWhiteSpace(userInput))
-                return "Please ask me something about cybersecurity!";
-
-            // Check for memory recall first
-            string memoryResponse = HandleMemoryRecall(userInput);
-            if (memoryResponse != null)
+            // If conversation ended but user asks a question, restart conversation
+            if (conversationEnded)
             {
-                CacheResponse(userInput.ToLower(), memoryResponse);
-                return memoryResponse;
-            }
-
-            // Detect interests in the background
-            memory.DetectInterest(userInput);
-
-            // Normalize input early so all checks use it consistently
-            string normalizedInput = userInput.ToLower().Trim();
-
-            // Check if user wants another tip
-            if (WantsAnotherTip(normalizedInput) && lastTopic != null)
-            {
-                string tip = GetAnotherTip();
-                if (tip != null)
+                if (IsQuestionWord(userInput) || IsGreeting(userInput) || IsHelpRequest(userInput) ||
+                    DetectTopicFromSynonyms(userInput) != null || IsNameQuestion(userInput))
                 {
-                    string response = tip + "\n\nWould you like another tip?";
+                    conversationEnded = false;
+                }
+                else if (IsAcknowledgmentAfterGoodbye(userInput))
+                {
+                    string response = GetPostGoodbyeAcknowledgment();
+                    CacheResponse(userInput.ToLower(), response);
                     memory.SetLastBotResponse(response);
-                    CacheResponse(normalizedInput, response);
+                    return response;
+                }
+                else if (!string.IsNullOrWhiteSpace(userInput))
+                {
+                    string response = GetPostGoodbyeAcknowledgment();
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+                else
+                {
+                    string response = GetPostGoodbyeAcknowledgment();
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
                     return response;
                 }
             }
 
-            // Check if user wants to continue with current topic
-            bool wantsToContinue = WantsToContinue(normalizedInput);
-
-            if (wantsToContinue && lastTopic != null)
+            // Handle farewells - END conversation
+            if (IsFarewell(userInput))
             {
-                followUpCount++;
-                string response = GetFollowUpResponse(lastTopic, followUpCount);
+                string response = GetFarewellResponse();
+                CacheResponse(userInput.ToLower(), response);
                 memory.SetLastBotResponse(response);
-                CacheResponse(normalizedInput, response);
                 return response;
             }
 
-            // Check if user is confused
-            if (IsUserConfused(normalizedInput) && lastTopic != null)
+            // Handle gratitude
+            if (IsGratitude(userInput))
             {
-                string response = GetSimplifiedExplanation(lastTopic);
+                expectedResponse = null;
+                consecutiveNoCount = 0;
+                string response = GetGratitudeResponse();
+                CacheResponse(userInput.ToLower(), response);
                 memory.SetLastBotResponse(response);
-                CacheResponse(normalizedInput, response);
                 return response;
             }
 
-            // Check if user is asking for suggestions
-            if (normalizedInput.Contains("suggest") ||
-                normalizedInput.Contains("recommend") ||
-                normalizedInput.Contains("what should i learn"))
+            // Handle conversation ending phrases
+            if (IsConversationEnding(userInput))
             {
-                string response = memory.SuggestTopic();
+                string response = GetFinalGoodbye();
+                CacheResponse(userInput.ToLower(), response);
                 memory.SetLastBotResponse(response);
-                CacheResponse(normalizedInput, response);
                 return response;
             }
 
-            // Check for name-related questions
-            if (normalizedInput.Contains("what is my name") ||
-                normalizedInput.Contains("do you know my name") ||
-                normalizedInput.Contains("my name"))
+            // PRIORITY: Memory operations (including favorite topic and name recall)
+            string memoryResponse = HandleMemoryOperations(userInput);
+            if (memoryResponse != null)
             {
-                string response = HasUserName()
-                    ? $"Your name is {GetUserName()}!"
-                    : "I don't know your name yet. Please tell me!";
+                CacheResponse(userInput.ToLower(), memoryResponse);
+                memory.SetLastBotResponse(memoryResponse);
+                return memoryResponse;
+            }
+
+            // Detect sentiment and topic
+            string sentiment = DetectSentiment(userInput);
+            string detectedTopic = DetectTopicFromSynonyms(userInput);
+
+            // ========== HANDLE RESPONSE TO "WHAT'S WRONG?" ==========
+            if (expectedResponse == "asking_whats_wrong" && !string.IsNullOrEmpty(askingWhatsWrongFor))
+            {
+                string userLower = userInput.ToLower();
+                string detectedIssueTopic = DetectTopicFromSynonyms(userInput);
+                string originalEmotion = askingWhatsWrongFor;
+
+                if (detectedIssueTopic != null)
+                {
+                    currentTopic = detectedIssueTopic;
+                    followUpCount = 0;
+                    expectedResponse = "another_tip";
+                    askingWhatsWrongFor = null;
+
+                    string tip = tips.GetRandomTip(detectedIssueTopic, 0);
+                    string personalizedTip = memory.GetPersonalizedResponse(detectedIssueTopic, tip);
+                    string empatheticPrefix = GetEmpatheticResponseForEmotion(originalEmotion, detectedIssueTopic);
+
+                    string response = $"{empatheticPrefix}{personalizedTip}\n\nWould you like another tip?";
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                if (userLower.Contains("just") || userLower.Contains("everything") || userLower.Length < 10)
+                {
+                    expectedResponse = null;
+                    askingWhatsWrongFor = null;
+                    string response = "I understand. Would you like me to suggest some cybersecurity topics that might help you feel more secure?";
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                expectedResponse = null;
+                askingWhatsWrongFor = null;
+                string defaultResponse = "I want to help. What cybersecurity topic would you like to learn about? I can help with passwords, phishing, malware, WiFi security, VPNs, or 2FA.";
+                CacheResponse(userInput.ToLower(), defaultResponse);
+                memory.SetLastBotResponse(defaultResponse);
+                return defaultResponse;
+            }
+
+            // ========== HANDLE ALL EMOTIONS WITHOUT TOPIC ==========
+            if ((sentiment == "angry" || sentiment == "worried" || sentiment == "frustrated" ||
+                 sentiment == "sad") && detectedTopic == null)
+            {
+                expectedResponse = "asking_whats_wrong";
+                askingWhatsWrongFor = sentiment;
+                string empatheticPrefix = GetEmpatheticResponseForEmotion(sentiment);
+                string followUpQuestion = GetFollowUpQuestionForEmotion(sentiment);
+                string response = empatheticPrefix + followUpQuestion;
+                CacheResponse(userInput.ToLower(), response);
                 memory.SetLastBotResponse(response);
-                CacheResponse(normalizedInput, response);
                 return response;
             }
 
-            // Check for repeat request
-            if (memory.IsAskingAgain(userInput) && lastTopic != null)
+            if (sentiment == "happy" && detectedTopic == null)
             {
-                followUpCount = 1;
-                string response = "Let me repeat: " + GetFollowUpResponse(lastTopic, 0);
+                expectedResponse = "learning_interest";
+                string empatheticPrefix = GetEmpatheticResponseForEmotion("happy");
+                string response = empatheticPrefix + "Would you like to learn about cybersecurity today?";
+                CacheResponse(userInput.ToLower(), response);
                 memory.SetLastBotResponse(response);
-                CacheResponse(normalizedInput, response);
                 return response;
             }
 
-            // Check cache first
-            if (responseCache.TryGetValue(normalizedInput, out string cachedResponse))
+            if (sentiment == "curious" && detectedTopic == null)
             {
-                memory.SetLastBotResponse(cachedResponse);
-                return cachedResponse;
+                expectedResponse = null;
+                string response = GetTopicSuggestions();
+                CacheResponse(userInput.ToLower(), response);
+                memory.SetLastBotResponse(response);
+                return response;
             }
 
-            // ========== FIXED: CYBERSECURITY TOPICS FIRST (HIGHEST PRIORITY) ==========
+            if (sentiment == "confident" && detectedTopic == null)
+            {
+                expectedResponse = null;
+                string[] confidentResponses = {
+                    "That's great! Would you like to learn about another cybersecurity topic?",
+                    "Excellent! Feel free to ask me about any cybersecurity topic you're interested in.",
+                    "Awesome! I'm here if you have any cybersecurity questions."
+                };
+                string response = confidentResponses[random.Next(confidentResponses.Length)];
+                CacheResponse(userInput.ToLower(), response);
+                memory.SetLastBotResponse(response);
+                return response;
+            }
 
-            // Sort keywords by length (longest first) for better matching
-            var sortedData = data.secureData
-                .OrderByDescending(x => x.Value.keywords.Max(k => k.Length));
+            // ========== HANDLE ALL EMOTIONS WITH TOPIC ==========
+            if ((sentiment == "angry" || sentiment == "worried" || sentiment == "frustrated" ||
+                 sentiment == "sad" || sentiment == "happy" || sentiment == "curious" ||
+                 sentiment == "confident") && detectedTopic != null)
+            {
+                currentTopic = detectedTopic;
+                followUpCount = 0;
+                conversationEnded = false;
 
-            // Split into words for matching
+                string tip = tips.GetRandomTip(detectedTopic, 0);
+                string personalizedTip = memory.GetPersonalizedResponse(detectedTopic, tip);
+                string empatheticPrefix = GetEmpatheticResponseForEmotion(sentiment, detectedTopic);
+
+                if (sentiment == "curious" || sentiment == "confident" || sentiment == "happy")
+                {
+                    expectedResponse = "learn_more";
+                    string response = $"{empatheticPrefix}{personalizedTip}\n\nWould you like to learn more about {detectedTopic}?";
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+                else
+                {
+                    expectedResponse = "another_tip";
+                    string response = $"{empatheticPrefix}{personalizedTip}\n\nWould you like another tip?";
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+            }
+
+            // Handle question words
+            if (IsQuestionWord(userInput) && currentTopic == null && expectedResponse == null)
+            {
+                string response = GetQuestionResponse(userInput);
+                CacheResponse(userInput.ToLower(), response);
+                memory.SetLastBotResponse(response);
+                return response;
+            }
+
+            if (IsEmptyOrGibberish(userInput))
+            {
+                if (expectedResponse != null && !string.IsNullOrEmpty(lastQuestion))
+                {
+                    return lastQuestion;
+                }
+                return "Please ask me a cybersecurity question, or type 'help' to see what topics I can teach you about.";
+            }
+
+            consecutiveUnknownResponses = 0;
+
+            if (IsDismissal(userInput))
+            {
+                expectedResponse = null;
+                consecutiveNoCount = 0;
+                string response = "Alright! Feel free to ask me about cybersecurity topics whenever you're ready. I'm here to help!";
+                CacheResponse(userInput.ToLower(), response);
+                memory.SetLastBotResponse(response);
+                return response;
+            }
+
+            string singleWordTopic = DetectTopicFromSynonyms(userInput);
+
+            if (singleWordTopic != null && userInput.Split(' ').Length <= 3)
+            {
+                string response = GetResponseForTopic(singleWordTopic);
+                CacheResponse(userInput.ToLower(), response);
+                memory.SetLastBotResponse(response);
+                return response;
+            }
+
+            if ((userInput.ToLower().Contains("protect me") || userInput.ToLower().Contains("help me")) && detectedTopic != null)
+            {
+                currentTopic = detectedTopic;
+                followUpCount = 0;
+                consecutiveNoCount = 0;
+                conversationEnded = false;
+
+                string tip = tips.GetRandomTip(detectedTopic, 0);
+                string personalizedTip = memory.GetPersonalizedResponse(detectedTopic, tip);
+
+                expectedResponse = "another_tip";
+                string response = $"I can definitely help you stay safe from {detectedTopic}.\n\n{personalizedTip}\n\nWould you like another tip?";
+
+                CacheResponse(userInput.ToLower(), response);
+                memory.SetLastBotResponse(response);
+                return response;
+            }
+
+            if (IsGreeting(userInput))
+            {
+                expectedResponse = "learning_interest";
+                consecutiveNoCount = 0;
+                conversationEnded = false;
+                string greeting = GetPersonalizedGreeting();
+                lastQuestion = "Ready to learn more about cybersecurity?";
+                greeting += $"\n\n{lastQuestion}";
+                CacheResponse(userInput.ToLower(), greeting);
+                memory.SetLastBotResponse(greeting);
+                return greeting;
+            }
+
+            if (IsHelpRequest(userInput))
+            {
+                expectedResponse = null;
+                consecutiveNoCount = 0;
+                conversationEnded = false;
+                string helpResponse = GetTopicSuggestions();
+                CacheResponse(userInput.ToLower(), helpResponse);
+                memory.SetLastBotResponse(helpResponse);
+                return helpResponse;
+            }
+
+            if (IsAffirmativeResponse(userInput))
+            {
+                consecutiveNoCount = 0;
+                conversationEnded = false;
+
+                if (expectedResponse == "learn_more" && currentTopic != null)
+                {
+                    string response = ProvideTip(currentTopic, true);
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                if (expectedResponse == "learning_interest")
+                {
+                    string response = GetTopicSuggestions();
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                if (expectedResponse == "another_tip" && currentTopic != null)
+                {
+                    string response = ProvideTip(currentTopic, true);
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                if (expectedResponse == null)
+                {
+                    string response = GetTopicSuggestions();
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+            }
+
+            // Handle "no" response
+            if (IsNegativeResponse(userInput))
+            {
+                consecutiveNoCount++;
+                conversationEnded = false;
+
+                if (consecutiveNoCount >= 2)
+                {
+                    string response = GetFinalGoodbye();
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                if (expectedResponse == "learn_more" && currentTopic != null)
+                {
+                    expectedResponse = "topic_selection";
+                    currentTopic = null;
+                    string response = $"No problem! What other cybersecurity topic would you like to learn about?\n\n{GetTopicSuggestions()}";
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                if (expectedResponse == "another_tip" && currentTopic != null)
+                {
+                    expectedResponse = "topic_selection";
+                    currentTopic = null;
+                    string response = $"Okay! Would you like to learn about a different cybersecurity topic?\n\n{GetTopicSuggestions()}";
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                if (expectedResponse == "learning_interest")
+                {
+                    string response = GetFinalGoodbye();
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                if (expectedResponse == "topic_selection")
+                {
+                    string response = GetFinalGoodbye();
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
+                expectedResponse = "topic_selection";
+                string genericResponse = $"No problem! What cybersecurity topic would you like to learn about?\n\n{GetTopicSuggestions()}";
+                CacheResponse(userInput.ToLower(), genericResponse);
+                memory.SetLastBotResponse(genericResponse);
+                return genericResponse;
+            }
+
+            if (!IsNegativeResponse(userInput))
+            {
+                consecutiveNoCount = 0;
+            }
+
+            memory.DetectInterest(userInput);
+            string normalizedInput = userInput.ToLower().Trim();
+
+            var sortedData = data.secureData.OrderByDescending(x => x.Value.keywords.Max(k => k.Length));
             string[] words = SplitWords(normalizedInput);
 
-            // Check for keyword matches (Cybersecurity topics - HIGH PRIORITY)
             foreach (var item in sortedData)
             {
                 foreach (var keyword in item.Value.keywords)
                 {
-                    // For multi-word keywords, use Contains on full string
+                    bool matched = false;
+
                     if (keyword.Contains(' '))
                     {
-                        if (normalizedInput.Contains(keyword))
-                        {
-                            lastTopic = item.Key;
-                            followUpCount = 1;
-                            string topicResponse = item.Value.response + "\n\nWould you like me to share some tips about this?";
-                            CacheResponse(normalizedInput, topicResponse);
-                            memory.SetLastBotResponse(topicResponse);
-                            return topicResponse;
-                        }
+                        matched = normalizedInput.Contains(keyword);
                     }
-                    // For single-word keywords, check whole words only
                     else
                     {
-                        bool matched = words.Contains(keyword) ||
-                                       IsWholeWord(normalizedInput, keyword);
-                        if (matched)
+                        matched = words.Contains(keyword) || IsWholeWord(normalizedInput, keyword);
+                    }
+
+                    if (matched)
+                    {
+                        currentTopic = item.Key;
+                        followUpCount = 0;
+                        consecutiveNoCount = 0;
+                        conversationEnded = false;
+
+                        string baseResponse = item.Value.response;
+                        string tip = tips.GetRandomTip(currentTopic, 0);
+                        string personalizedTip = memory.GetPersonalizedResponse(currentTopic, tip);
+
+                        string finalResponse;
+
+                        if (sentiment == "curious")
                         {
-                            lastTopic = item.Key;
-                            followUpCount = 1;
-                            string topicResponse = item.Value.response + "\n\nWould you like me to share some tips about this?";
-                            CacheResponse(normalizedInput, topicResponse);
-                            memory.SetLastBotResponse(topicResponse);
-                            return topicResponse;
+                            expectedResponse = null;
+                            finalResponse = $"Great curiosity! Here's information about {currentTopic}:\n\n{baseResponse}\n\n{personalizedTip}\n\nWhat else would you like to know?";
+                        }
+                        else
+                        {
+                            expectedResponse = "learn_more";
+                            finalResponse = $"{baseResponse}\n\nWould you like me to share some tips about {currentTopic}?";
+                        }
+
+                        CacheResponse(normalizedInput, finalResponse);
+                        memory.SetLastBotResponse(finalResponse);
+                        return finalResponse;
+                    }
+                }
+            }
+
+            if (IsUserConfused(normalizedInput) && currentTopic != null)
+            {
+                expectedResponse = null;
+                consecutiveNoCount = 0;
+                string response = GetSimplifiedExplanation(currentTopic);
+                memory.SetLastBotResponse(response);
+                CacheResponse(normalizedInput, response);
+                return response;
+            }
+
+            if (WantsAnotherTip(normalizedInput) && currentTopic != null)
+            {
+                string response = ProvideTip(currentTopic, true);
+                CacheResponse(normalizedInput, response);
+                memory.SetLastBotResponse(response);
+                return response;
+            }
+
+            if (expectedResponse != null && !string.IsNullOrEmpty(lastQuestion))
+            {
+                CacheResponse(normalizedInput, lastQuestion);
+                memory.SetLastBotResponse(lastQuestion);
+                return lastQuestion;
+            }
+
+            if (currentTopic == null || expectedResponse == "topic_selection")
+            {
+                string response = GetTopicSuggestions();
+                CacheResponse(normalizedInput, response);
+                memory.SetLastBotResponse(response);
+                return response;
+            }
+
+            if (currentTopic != null)
+            {
+                string offerResponse = $"Would you like to learn more about {currentTopic} or try a different topic?";
+                expectedResponse = "learn_more";
+                lastQuestion = offerResponse;
+                CacheResponse(normalizedInput, offerResponse);
+                memory.SetLastBotResponse(offerResponse);
+                return offerResponse;
+            }
+
+            if (!IsAffirmativeResponse(normalizedInput) && !IsNegativeResponse(normalizedInput))
+            {
+                foreach (var emotion in data.emotions)
+                {
+                    foreach (var keyword in emotion.Value.keywords)
+                    {
+                        if (IsWholeWord(normalizedInput, keyword))
+                        {
+                            expectedResponse = null;
+                            consecutiveNoCount = 0;
+                            string emotionResponse = emotion.Value.response;
+                            if (!string.IsNullOrEmpty(GetUserName()))
+                            {
+                                emotionResponse = $"{GetUserName()}, " + emotionResponse.ToLower();
+                            }
+                            CacheResponse(normalizedInput, emotionResponse);
+                            memory.SetLastBotResponse(emotionResponse);
+                            return emotionResponse;
                         }
                     }
                 }
             }
 
-            // ========== EMOTIONS CHECK SECOND (LOWER PRIORITY) ==========
-            // Check for emotional responses - only if no cybersecurity topic matched
-            foreach (var emotion in data.emotions)
-            {
-                foreach (var keyword in emotion.Value.keywords)
-                {
-                    if (IsWholeWord(normalizedInput, keyword))
-                    {
-                        string emotionResponse = emotion.Value.response;
-                        CacheResponse(normalizedInput, emotionResponse);
-                        memory.SetLastBotResponse(emotionResponse);
-                        return emotionResponse;
-                    }
-                }
-            }
-
-            // Return random fallback response
             string fallback = fallbackResponses[random.Next(fallbackResponses.Length)];
             CacheResponse(normalizedInput, fallback);
             memory.SetLastBotResponse(fallback);
             return fallback;
         }
 
-        // Get follow-up response based on last topic and follow-up count
-        private string GetFollowUpResponse(string topic, int followNumber)
+        private string GetSimplifiedExplanation(string topic)
         {
             switch (topic)
             {
                 case "password":
-                    if (followNumber == 1)
-                        return tips.GetRandomTip("password", 0) + "\n\nWould you like another password tip?";
-                    else if (followNumber == 2)
-                        return tips.GetRandomTip("password", 1) + "\n\nWant to hear more about password security?";
-                    else
-                        return tips.GetRandomTip("password", 2) + "\n\nWould you like to learn about 2FA?";
-
+                    return "Let me explain simply: A strong password is like a good lock on your front door. Make it long (12+ characters), mix letters and numbers, and never reuse passwords. Simple enough?";
                 case "phishing":
-                    if (followNumber == 1)
-                        return tips.GetRandomTip("phishing", 0) + "\n\nWant another phishing tip?";
-                    else if (followNumber == 2)
-                        return tips.GetRandomTip("phishing", 1) + "\n\nNeed more advice on avoiding scams?";
-                    else
-                        return tips.GetRandomTip("phishing", 2) + "\n\nWould you like more examples of phishing?";
-
+                    return "Think of phishing like a fake phone call from someone pretending to be your bank. Scammers send fake emails trying to trick you. Always check who's really asking! Make sense?";
                 case "malware":
-                    if (followNumber == 1)
-                        return tips.GetRandomTip("malware", 0) + "\n\nWant another malware protection tip?";
-                    else if (followNumber == 2)
-                        return tips.GetRandomTip("malware", 1) + "\n\nNeed more protection advice?";
-                    else
-                        return tips.GetRandomTip("malware", 2) + "\n\nShall I continue with more security tips?";
-
+                    return "Malware is like a computer virus - bad software that can damage your device. Avoid downloading suspicious files. Does that help?";
+                case "wifi":
+                    return "WiFi security is about protecting your wireless network. Think of it like locking your front door - make sure only trusted people can use your internet.";
                 case "vpn":
-                    if (followNumber == 1)
-                        return tips.GetRandomTip("vpn", 0) + "\n\nWant another VPN tip?";
-                    else if (followNumber == 2)
-                        return tips.GetRandomTip("vpn", 1) + "\n\nNeed more VPN advice?";
-                    else
-                        return tips.GetRandomTip("vpn", 2) + "\n\nWould you like to learn more about VPN protocols?";
-
+                    return "A VPN is like a secret tunnel for your internet traffic. It hides what you're doing online from others, especially on public WiFi.";
                 case "2fa":
-                    if (followNumber == 1)
-                        return tips.GetRandomTip("2fa", 0) + "\n\nWant another 2FA tip?";
-                    else if (followNumber == 2)
-                        return tips.GetRandomTip("2fa", 1) + "\n\nNeed more security advice?";
-                    else
-                        return tips.GetRandomTip("2fa", 2) + "\n\nWould you like to learn about password managers next?";
-
+                    return "2FA is like having both a key AND a code to open a safe. Even if someone steals your password, they still need the code from your phone.";
                 default:
-                    return $"I can provide more detailed information about {topic}. What specific aspect would you like to know about?";
+                    return $"Let me explain {topic} in simpler terms. What specific part confuses you?";
             }
         }
 
-        // Cache response for future use
         private void CacheResponse(string input, string response)
         {
             if (responseCache.Count < 100 && !responseCache.ContainsKey(input))
@@ -452,34 +1257,35 @@ namespace SecureIQ_Africa
             }
         }
 
-        // Reset response cache
         public void ResetCache()
         {
             responseCache.Clear();
         }
 
-        // Reset conversation context
         public void ResetConversation()
         {
-            lastTopic = null;
+            currentTopic = null;
             followUpCount = 0;
+            expectedResponse = null;
+            lastQuestion = null;
+            consecutiveUnknownResponses = 0;
+            consecutiveNoCount = 0;
+            conversationEnded = false;
+            askingWhatsWrongFor = null;
             responseCache.Clear();
         }
 
-        // Get memory instance for integration
         public Memory GetMemory()
         {
             return memory;
         }
 
-        // Clear all memory
         public void ClearMemory()
         {
             memory.ClearMemory();
             ResetConversation();
         }
 
-        // Process message with full context
         public ChatResponse ProcessMessage(string userMessage)
         {
             string responseMessage = GetResponse(userMessage);
@@ -496,7 +1302,6 @@ namespace SecureIQ_Africa
         }
     }
 
-    // Response model
     public class ChatResponse
     {
         public string Message { get; set; }

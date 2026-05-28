@@ -64,7 +64,7 @@
             <StackPanel x:Name="ChatPanel" Margin="10"/>
         </ScrollViewer>
 
-        <!-- Input Area - Fixed Layout -->
+        <!-- Input Area -->
         <Grid Grid.Row="3" Margin="10,10,1,20" Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -72,12 +72,12 @@
             </Grid.ColumnDefinitions>
 
             <!-- TextBox -->
-            <TextBox x:Name="userInput" FontSize="14" Background="#FF94999E" 
+            <TextBox x:Name="userInput" FontSize="14" Background="#FFD6D6D6" 
                      Margin="0,0,15,0" 
                      Height="60" TextWrapping="Wrap" 
                      Padding="8,5,8,5" MinHeight="60"
-                     Foreground="White" CaretBrush="White"
-                     VerticalAlignment="Center"/>
+                     Foreground="Black" CaretBrush="White"
+                     VerticalAlignment="Center" BorderBrush="#FF5D5D5D"/>
 
             <!-- OVAL BUTTON - Fixed version -->
             <Button Grid.Column="1" Content="Send" Width="130" Height="55"
