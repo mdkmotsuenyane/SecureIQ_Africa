@@ -168,7 +168,7 @@ git clone https://github.com/mdkmotsuenyane/SecureIQ_Africa.git
 ## 📺 YouTube Demo
 
 ```
-https://youtu.be/G1AP2P_0bs4?si=v5UgQFcuTsKxug_s
+https://youtu.be/XN6bmGXRCRI
 ```
 
 ## 👨‍💻 Author
