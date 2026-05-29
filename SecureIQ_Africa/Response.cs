@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SecureIQ_Africa
 {
@@ -23,6 +24,11 @@ namespace SecureIQ_Africa
         private string askingWhatsWrongFor = null;
         private Dictionary<string, string> responseCache = new Dictionary<string, string>();
         private static readonly Random random = new Random();
+
+        // Validation constants
+        private const int MAX_INPUT_LENGTH = 1000;
+        private const int MAX_CONSECUTIVE_INVALID = 5;
+        private int consecutiveInvalidInputs = 0;
 
         // Synonym mapping for topics
         private Dictionary<string, string[]> topicSynonyms = new Dictionary<string, string[]>()
@@ -86,8 +92,16 @@ namespace SecureIQ_Africa
 
         public void SetUserName(string userName)
         {
-            name = userName;
-            memory.SetUserName(userName);
+            // Validate username
+            if (!string.IsNullOrWhiteSpace(userName))
+            {
+                string validatedName = ValidateAndSanitizeInput(userName);
+                if (!string.IsNullOrEmpty(validatedName) && validatedName.Length <= 50)
+                {
+                    name = validatedName;
+                    memory.SetUserName(userName);
+                }
+            }
         }
 
         public string GetUserName()
@@ -103,6 +117,73 @@ namespace SecureIQ_Africa
         public string GetPersonalizedGreeting()
         {
             return memory.GetPersonalizedGreeting();
+        }
+
+        // New validation method
+        private string ValidateAndSanitizeInput(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            // Trim whitespace
+            input = input.Trim();
+
+            // Check length
+            if (input.Length > MAX_INPUT_LENGTH)
+                input = input.Substring(0, MAX_INPUT_LENGTH);
+
+            // Remove control characters
+            input = Regex.Replace(input, @"[\x00-\x1F\x7F]", "");
+
+
+            // Normalize whitespace
+            input = Regex.Replace(input, @"\s+", " ");
+
+            return input.Trim();
+        }
+
+        // New method to check if input is gibberish
+        private bool IsGibberishInput(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return true;
+
+            // Check for excessive repetition of same character
+            if (Regex.IsMatch(input, @"(.)\1{10,}"))
+                return true;
+
+            // Check for keyboard mashing patterns
+            string lowerInput = input.ToLower();
+            if (Regex.IsMatch(lowerInput, @"[asdfghjkl]{8,}") ||
+                Regex.IsMatch(lowerInput, @"[qwertyuiop]{8,}") ||
+                Regex.IsMatch(lowerInput, @"[zxcvbnm]{8,}"))
+                return true;
+
+            // Check if input has no vowels and is longer than 10 chars (likely gibberish)
+            if (input.Length > 10 && !Regex.IsMatch(input, @"[aeiouAEIOU]"))
+                return true;
+
+            return false;
+        }
+
+        // New method to check for harmful patterns
+        private bool ContainsHarmfulPatterns(string input)
+        {
+            string lowerInput = input.ToLower();
+
+            // Check for SQL injection patterns
+            string[] sqlPatterns = { "select ", "insert ", "update ", "delete ", "drop ", "create ", "alter ", "exec ", "execute " };
+            foreach (string pattern in sqlPatterns)
+            {
+                if (lowerInput.Contains(pattern))
+                    return true;
+            }
+
+            // Check for script tags
+            if (lowerInput.Contains("<script") || lowerInput.Contains("javascript:"))
+                return true;
+
+            return false;
         }
 
         private bool IsWholeWord(string text, string word)
@@ -234,6 +315,11 @@ namespace SecureIQ_Africa
             string trimmed = input.Trim();
             if (trimmed.Length <= 2 && !IsAffirmativeResponse(trimmed) && !IsNegativeResponse(trimmed))
                 return true;
+
+            // Additional gibberish check
+            if (IsGibberishInput(trimmed))
+                return true;
+
             return false;
         }
 
@@ -729,6 +815,35 @@ namespace SecureIQ_Africa
 
         public string GetResponse(string userInput)
         {
+            // Validate input for harmful patterns
+            if (ContainsHarmfulPatterns(userInput))
+            {
+                consecutiveInvalidInputs++;
+                if (consecutiveInvalidInputs >= MAX_CONSECUTIVE_INVALID)
+                {
+                    consecutiveInvalidInputs = 0;
+                    return "I've noticed some concerning patterns in your messages. Let's keep our conversation focused on cybersecurity learning. What topic would you like to discuss?";
+                }
+                return "I can't process that request. Please ask me about cybersecurity topics like passwords, phishing, or online safety.";
+            }
+
+            // Sanitize input
+            userInput = ValidateAndSanitizeInput(userInput);
+
+            if (string.IsNullOrWhiteSpace(userInput))
+            {
+                consecutiveInvalidInputs++;
+                if (consecutiveInvalidInputs >= MAX_CONSECUTIVE_INVALID)
+                {
+                    consecutiveInvalidInputs = 0;
+                    return "I notice you're not typing any messages. Is there a cybersecurity topic I can help you with? Just let me know what you'd like to learn about.";
+                }
+                return "I didn't catch that. Could you please type a message about cybersecurity?";
+            }
+
+            // Reset consecutive invalid counter for valid input
+            consecutiveInvalidInputs = 0;
+
             userInput = SanitizeInput(userInput);
 
             // If conversation ended but user asks a question, restart conversation
@@ -1275,6 +1390,7 @@ namespace SecureIQ_Africa
             conversationEnded = false;
             askingWhatsWrongFor = null;
             responseCache.Clear();
+            consecutiveInvalidInputs = 0;
         }
 
         public Memory GetMemory()
