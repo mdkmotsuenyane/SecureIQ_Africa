@@ -263,7 +263,7 @@ namespace SecureIQ_Africa
                 }
                 catch
                 {
-                    // Silently fail if even backup fails
+                    Console.WriteLine("Saving failed");
                 }
             }
         }

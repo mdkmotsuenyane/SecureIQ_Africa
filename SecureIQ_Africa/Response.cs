@@ -6,8 +6,10 @@ namespace SecureIQ_Africa
 {
     public class Response
     {
+        //attributes with a getter and setter
         public string name { get; set; }
 
+        //attributes
         private SecureData data = new SecureData();
         private Memory memory = new Memory();
         private ResponseTips tips = new ResponseTips();
@@ -760,7 +762,7 @@ namespace SecureIQ_Africa
                 }
             }
 
-            // Handle farewells - END conversation
+            // Handle farewells 
             if (IsFarewell(userInput))
             {
                 string response = GetFarewellResponse();
@@ -789,7 +791,7 @@ namespace SecureIQ_Africa
                 return response;
             }
 
-            // PRIORITY: Memory operations (including favorite topic and name recall)
+            // Proirity Memory operations including favorite topic and name recall
             string memoryResponse = HandleMemoryOperations(userInput);
             if (memoryResponse != null)
             {
@@ -802,7 +804,7 @@ namespace SecureIQ_Africa
             string sentiment = DetectSentiment(userInput);
             string detectedTopic = DetectTopicFromSynonyms(userInput);
 
-            // ========== HANDLE RESPONSE TO "WHAT'S WRONG?" ==========
+            // HANDLE RESPONSE TO "WHAT'S WRONG?" 
             if (expectedResponse == "asking_whats_wrong" && !string.IsNullOrEmpty(askingWhatsWrongFor))
             {
                 string userLower = userInput.ToLower();
@@ -844,7 +846,7 @@ namespace SecureIQ_Africa
                 return defaultResponse;
             }
 
-            // ========== HANDLE ALL EMOTIONS WITHOUT TOPIC ==========
+            //  HANDLE ALL EMOTIONS WITHOUT TOPIC 
             if ((sentiment == "angry" || sentiment == "worried" || sentiment == "frustrated" ||
                  sentiment == "sad") && detectedTopic == null)
             {
@@ -891,7 +893,7 @@ namespace SecureIQ_Africa
                 return response;
             }
 
-            // ========== HANDLE ALL EMOTIONS WITH TOPIC ==========
+            // HANDLE ALL EMOTIONS WITH TOPIC 
             if ((sentiment == "angry" || sentiment == "worried" || sentiment == "frustrated" ||
                  sentiment == "sad" || sentiment == "happy" || sentiment == "curious" ||
                  sentiment == "confident") && detectedTopic != null)

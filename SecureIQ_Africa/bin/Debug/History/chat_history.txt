@@ -638,3 +638,37 @@ Enable biometric login (fingerprint/face ID) where available for extra security.
 
 Would you like another tip?
 2026-05-29 00:48:12 - Palesa: no
+2026-05-29 10:21:12 - Thato: what is phishing
+2026-05-29 10:21:14 - Bot: Thato, Great curiosity about phishing! Let me share something interesting.
+
+Don't download attachments from unknown senders - they could contain malware.
+
+Would you like to learn more about phishing?
+2026-05-29 10:21:28 - Thato: what is my name
+2026-05-29 10:21:30 - Bot: Your name is Thato! I remember you told me earlier.
+2026-05-29 10:21:40 - Thato: okay
+2026-05-29 10:21:42 - Bot: Check the sender's email address carefully - scammers use addresses that look almost real.
+
+Would you like another tip?
+2026-05-29 10:22:06 - Thato: what are scams
+2026-05-29 10:22:08 - Bot: Phishing is the fraudulent practice of sending emails or other messages purporting to be from reputable companies in order to induce individuals to reveal personal information, such as passwords and credit card numbers.
+Watch out for emails or messages asking for personal info. When in doubt, don't click links.
+
+Here's a helpful tip:
+When in doubt, go directly to the website by typing the URL yourself, not clicking the link.
+
+Would you like to learn more about phishing?
+2026-05-29 10:22:24 - Thato: no
+2026-05-29 10:22:26 - Bot: No problem! What other cybersecurity topic would you like to learn about?
+
+What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-05-29 10:22:36 - Thato: no
+2026-05-29 10:22:38 - Bot: Alright Thato, no problem! I'll be here if you want to learn about cybersecurity later. Stay safe online!

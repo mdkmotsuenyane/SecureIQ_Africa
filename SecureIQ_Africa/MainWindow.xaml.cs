@@ -39,8 +39,8 @@ namespace SecureIQ_Africa
                 respond.name = name;
             }
 
-            // Close the Welcome window and open the MainWindow
-             SecureIQChatWindow chatWindow = new SecureIQChatWindow(name);
+            // Close the MainWindow and open the SecureIQChatWindow
+            SecureIQChatWindow chatWindow = new SecureIQChatWindow(name);
             chatWindow.Show();
             this.Close();
         }
