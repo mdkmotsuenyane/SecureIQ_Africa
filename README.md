@@ -8,6 +8,7 @@ It features a modern graphical user interface, AI-style keyword response system,
 
 ### Core Features
 - 💬 Interactive cybersecurity chatbot with modern GUI
+- 👌 Improved Input Validation
 - 🧠 Keyword-based response engine for cybersecurity education
 - 🗣️ Voice greeting using System.Media.SoundPlayer
 - ⌨️ Typing animation effect for realistic bot responses
@@ -168,7 +169,7 @@ git clone https://github.com/mdkmotsuenyane/SecureIQ_Africa.git
 ## 📺 YouTube Demo
 
 ```
-https://youtu.be/XN6bmGXRCRI
+https://youtu.be/8QSUSvLq3RI
 ```
 
 ## 👨‍💻 Author
