@@ -327,8 +327,8 @@ For questions or support regarding this project:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| v2.2 | June 2026 | Added NLP Engine, Quiz System, Task Manager with SQL, Activity Log |
-| v2.1 | May 2025 | WPF GUI version with typing animations, sentiment detection, memory & recall, empathetic responses |
+| v3.0| June 2026 | Added NLP Engine, Quiz System, Task Manager with SQL, Activity Log |
+| v2.0 | May 2025 | WPF GUI version with typing animations, sentiment detection, memory & recall, empathetic responses |
 | v1.0 | April 2025 | Console‑based version with speech synthesis |
 
 ## 🧪 Supported Cybersecurity Topics
