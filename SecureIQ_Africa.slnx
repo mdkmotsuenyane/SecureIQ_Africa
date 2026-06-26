@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="SecureIQ_Africa/SecureIQ_Africa.csproj" Id="b9609d09-3669-411e-b9c7-3f45a59f6017" />
+  <Project Path="TaskChat/TaskChat.sqlproj" Id="5b302238-1d60-41c1-aa38-f39090d73130">
+    <Build />
+    <Deploy />
+  </Project>
 </Solution>
