@@ -28,15 +28,15 @@ x86/
 [Aa][Rr][Mm]64/
 bld/
 # =======================================================
-# MODIFIED SECTION START: Ignore bin/obj contents but allow mysql folder
+# MODIFIED SECTION START: Ignore bin/obj contents but allow nested mysql folder
 # =======================================================
 [Bb]in/**
-![Bb]in/[Mm]ysql/
-![Bb]in/[Mm]ysql/**
+!**/[Bb]in/**/[Mm]ysql/
+!**/[Bb]in/**/[Mm]ysql/**
 
 [Oo]bj/**
-![Oo]bj/[Mm]ysql/
-![Oo]bj/[Mm]ysql/**
+!**/[Oo]bj/**/[Mm]ysql/
+!**/[Oo]bj/**/[Mm]ysql/**
 # =======================================================
 # MODIFIED SECTION END
 # =======================================================
