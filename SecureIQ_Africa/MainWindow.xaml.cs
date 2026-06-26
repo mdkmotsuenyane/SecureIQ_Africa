@@ -1,48 +1,85 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Media;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SecureIQ_Africa
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly string soundPath = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "SecureIQ.wav"
+        );
+
+        private SoundPlayer _greetingPlayer;
+
         public MainWindow()
         {
             InitializeComponent();
+            this.Loaded += (s, e) => Greeting();
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = NameTextBox.Text;
+            string name = NameTextBox.Text?.Trim();
+
             if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show("Please enter a valid name!");
+                MessageBox.Show(
+                    "Please enter a valid name!",
+                    "Input Required",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
                 return;
             }
-            else
-            {
-                Response respond = new Response();
-                respond.name = name;
-            }
 
-            // Close the MainWindow and open the SecureIQChatWindow
-            SecureIQChatWindow chatWindow = new SecureIQChatWindow(name);
-            chatWindow.Show();
+            // ✅ Log using the ActivityLogService (instead of ActivityLogger)
+            ActivityLogService.AddEntry($"User '{name}' submitted their name.");
+
+            Menu menu = new Menu(name);
+            menu.Show();
             this.Close();
+        }
+
+        private void Greeting()
+        {
+            try
+            {
+                if (File.Exists(soundPath))
+                {
+                    _greetingPlayer = new SoundPlayer(soundPath);
+                    _greetingPlayer.Play();
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Welcome sound not found.",
+                        "Info",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                // Also log errors via the service
+                ActivityLogService.AddEntry($"Error playing greeting sound: {ex.Message}");
+
+                MessageBox.Show(
+                    $"Error playing sound: {ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _greetingPlayer?.Dispose();
+            base.OnClosed(e);
         }
     }
 }

@@ -1,0 +1,275 @@
+﻿<Window x:Class="SecureIQ_Africa.Menu"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SecureIQ_Africa"
+        mc:Ignorable="d"
+        Title="SecureIQ Africa - Menu"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF0A1A3A" 
+        Icon="/icon.png"
+        SizeToContent="WidthAndHeight"
+         MinWidth="900"
+         MinHeight="550">
+
+
+    <Grid Margin="20">
+        <!-- Outer margin for breathing room -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== HEADER ===== -->
+        <Border Grid.Row="0" Background="#FF040237" Padding="20,10" Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ASCII Art (unchanged) -->
+                <Viewbox Grid.Column="0" Stretch="Uniform" HorizontalAlignment="Stretch" 
+                         VerticalAlignment="Center" Height="80" Margin="0,0,10,0">
+                    <TextBlock xml:space="preserve" FontFamily="Consolas" FontSize="7.5" 
+                               Foreground="#FFAFAEB1" FontWeight="Bold" 
+                               TextAlignment="Left" TextWrapping="NoWrap">
+█████████                                                  █████    ██████         █████████      ██████             ███                    
+ ███░░░░░███                                                ░░███   ███░░░░███      ███░░░░░███    ███░░███           ░░░                     
+░███    ░░░   ██████   ██████  █████ ████ ████████   ██████  ░███  ███    ░░███    ░███    ░███   ░███ ░░░  ████████  ████   ██████   ██████  
+░░█████████  ███░░███ ███░░███░░███ ░███ ░░███░░███ ███░░███ ░███ ░███     ░███    ░███████████  ███████   ░░███░░███░░███  ███░░███ ░░░░░███ 
+ ░░░░░░░░███░███████ ░███ ░░░  ░███ ░███  ░███ ░░░ ░███████  ░███ ░███   ██░███    ░███░░░░░███ ░░░███░     ░███ ░░░  ░███ ░███ ░░░   ███████ 
+ ███    ░███░███░░░  ░███  ███ ░███ ░███  ░███     ░███░░░   ░███ ░░███ ░░████     ░███    ░███   ░███      ░███      ░███ ░███  ███ ███░░███ 
+░░█████████ ░░██████ ░░██████  ░░████████ █████    ░░██████  █████ ░░░██████░██    █████   █████  █████     █████     █████░░██████ ░░████████
+ ░░░░░░░░░   ░░░░░░   ░░░░░░    ░░░░░░░░ ░░░░░      ░░░░░░  ░░░░░    ░░░░░░ ░░    ░░░░░   ░░░░░  ░░░░░     ░░░░░     ░░░░░  ░░░░░░   ░░░░░░░░
+                    </TextBlock>
+                </Viewbox>
+
+                <!-- Logo -->
+            </Grid>
+        </Border>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Welcome Title -->
+            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,20">
+                <TextBlock x:Name="TextBox1" Text="Welcome to" FontSize="28" Foreground="#FFAFAEB1" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                <TextBlock Text="SecureIQ Africa" FontSize="48" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                <TextBlock Text="Your trusted partner in cybersecurity awareness" FontSize="18" Foreground="#FF6A8A9E" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+            </StackPanel>
+
+            <!-- Menu Buttons -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!-- QUIZ BUTTON -->
+                <Button x:Name="QuizButton"
+                        Width="280"              
+                    Height="200"
+                        Margin="0,0,30,0"   
+                        Cursor="Hand"
+                        Click="QuizButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="#FF040237"
+                                    BorderBrush="#FF0A2D5C"
+                                    BorderThickness="2"
+                                    CornerRadius="16"
+                                    Padding="20">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Viewbox Width="60" Height="60" Margin="0,0,0,15">
+                                        <Canvas Width="64" Height="64">
+                                            <Ellipse Canvas.Left="4" Canvas.Top="4" Width="56" Height="56" Fill="#FF0A6B3A" Opacity="0.3"/>
+                                            <TextBlock Canvas.Left="16" Canvas.Top="8" FontSize="36" Foreground="#FFAFAEB1" FontWeight="Bold" Text="Q"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                    <TextBlock Text="Take Quiz" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Test your cybersecurity knowledge" 
+                                               FontSize="14" Foreground="#FF6A8A9E" 
+                                               HorizontalAlignment="Center" Margin="0,8,0,0" 
+                                               TextWrapping="Wrap" TextAlignment="Center" MaxWidth="240"/>
+                                    <TextBlock Text="10 questions · 10 minutes" 
+                                               FontSize="12" Foreground="#FF3A5A6E" 
+                                               HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF0A2D5C"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF061A3A"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!-- CHAT BUTTON -->
+                <Button x:Name="ChatButton"
+                        Width="280"
+                        Height="200"
+                        Margin="0,0,30,0"
+                        Cursor="Hand"
+                        Click="ChatButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="#FF040237"
+                                    BorderBrush="#FF0A2D5C"
+                                    BorderThickness="2"
+                                    CornerRadius="16"
+                                    Padding="20">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Viewbox Width="60" Height="60" Margin="0,0,0,15">
+                                        <Canvas Width="64" Height="64">
+                                            <Ellipse Canvas.Left="4" Canvas.Top="4" Width="56" Height="56" Fill="#FF0A2D5C" Opacity="0.3"/>
+                                            <TextBlock Canvas.Left="12" Canvas.Top="8" FontSize="36" Foreground="#FFAFAEB1" FontWeight="Bold" Text="💬"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                    <TextBlock Text="Open Chat" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Ask questions &amp; get real-time advice" 
+                                               FontSize="14" Foreground="#FF6A8A9E" 
+                                               HorizontalAlignment="Center" Margin="0,8,0,0" 
+                                               TextWrapping="Wrap" TextAlignment="Center" MaxWidth="240"/>
+                                    <TextBlock Text="24/7 AI-powered assistant" 
+                                               FontSize="12" Foreground="#FF3A5A6E" 
+                                               HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF0A2D5C"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF061A3A"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!-- TASK MANAGER BUTTON (NEW) -->
+                <Button x:Name="TaskManagerButton"
+                        Width="280"
+                        Height="200"
+                        Margin="0,0,30,0"
+                        Cursor="Hand"
+                        Click="TaskManagerButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="#FF040237"
+                                    BorderBrush="#FF0A2D5C"
+                                    BorderThickness="2"
+                                    CornerRadius="16"
+                                    Padding="20">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Viewbox Width="60" Height="60" Margin="0,0,0,15">
+                                        <Canvas Width="64" Height="64">
+                                            <Ellipse Canvas.Left="4" Canvas.Top="4" Width="56" Height="56" Fill="#FFD4A017" Opacity="0.3"/>
+                                            <TextBlock Canvas.Left="14" Canvas.Top="8" FontSize="36" Foreground="#FFAFAEB1" FontWeight="Bold" Text="✅"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                    <TextBlock Text="Task Manager" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Organise your daily tasks &amp; to‑dos" 
+                                               FontSize="14" Foreground="#FF6A8A9E" 
+                                               HorizontalAlignment="Center" Margin="0,8,0,0" 
+                                               TextWrapping="Wrap" TextAlignment="Center" MaxWidth="240"/>
+                                    <TextBlock Text="Add, complete &amp; delete tasks" 
+                                               FontSize="12" Foreground="#FF3A5A6E" 
+                                               HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF0A2D5C"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF061A3A"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!-- VIEW LOGS BUTTON -->
+                <Button x:Name="LogsButton"
+                        Width="280"
+                        Height="200"
+                        Cursor="Hand"
+                        Click="LogsButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="#FF040237"
+                                    BorderBrush="#FF0A2D5C"
+                                    BorderThickness="2"
+                                    CornerRadius="16"
+                                    Padding="20">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Viewbox Width="60" Height="60" Margin="0,0,0,15">
+                                        <Canvas Width="64" Height="64">
+                                            <Ellipse Canvas.Left="4" Canvas.Top="4" Width="56" Height="56" Fill="#FFD4A017" Opacity="0.3"/>
+                                            <TextBlock Canvas.Left="14" Canvas.Top="8" FontSize="36" Foreground="#FFAFAEB1" FontWeight="Bold" Text="📋"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                    <TextBlock Text="View Logs" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="See your activity history" 
+                                               FontSize="14" Foreground="#FF6A8A9E" 
+                                               HorizontalAlignment="Center" Margin="0,8,0,0" 
+                                               TextWrapping="Wrap" TextAlignment="Center" MaxWidth="240"/>
+                                    <TextBlock Text="All actions recorded" 
+                                               FontSize="12" Foreground="#FF3A5A6E" 
+                                               HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF0A2D5C"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF061A3A"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- ===== FOOTER ===== -->
+        <Border Grid.Row="2" Background="#FF040237" Padding="15,10" Margin="0,20,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Exit" FontSize="12" FontWeight="Bold" Height="28" Width="60"
+                            Background="#FF2A1A1A" Foreground="#FFD0A0A0" Cursor="Hand"
+                            Click="ExitButton_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#FF2A1A1A"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#FF4A2A2A"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

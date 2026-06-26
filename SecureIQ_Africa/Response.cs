@@ -7,10 +7,8 @@ namespace SecureIQ_Africa
 {
     public class Response
     {
-        //attributes with a getter and setter
+        //  FIELDS
         public string name { get; set; }
-
-        //attributes
         private SecureData data = new SecureData();
         private Memory memory = new Memory();
         private ResponseTips tips = new ResponseTips();
@@ -24,12 +22,21 @@ namespace SecureIQ_Africa
         private string askingWhatsWrongFor = null;
         private Dictionary<string, string> responseCache = new Dictionary<string, string>();
         private static readonly Random random = new Random();
-
-        // ADDED: Input validation
         private int consecutiveInvalidInputs = 0;
         private const int MAX_INPUT_LENGTH = 2000;
+        private bool _pendingQuiz = false;
+        private string _pendingQuizTopic = null;
+        private NLPEngine nlpEngine = new NLPEngine();
+        private TaskManager taskManager = new TaskManager();   // Enhanced TaskManager
 
-        // Synonym mapping for topics
+        // For quiz offering
+        private string _quizOfferTopic = null;
+        private bool _quizOfferedForCurrentTopic = false;
+
+        // NEW: flag to signal UI to open TaskManagerWindow
+        private bool _openTaskManager = false;
+
+        // Synonym mapping
         private Dictionary<string, string[]> topicSynonyms = new Dictionary<string, string[]>()
         {
             { "password", new[] { "password", "pass", "login", "credential", "account access", "passwords", "password safety" } },
@@ -42,6 +49,7 @@ namespace SecureIQ_Africa
             { "backup", new[] { "backup", "restore", "data loss", "recovery", "back up" } }
         };
 
+        // Arrays of phrases
         private string[] fallbackResponses = new[]
         {
             "I want to help you learn about cybersecurity. Could you ask me about specific topics like passwords, phishing, malware, or WiFi security?",
@@ -84,11 +92,13 @@ namespace SecureIQ_Africa
             "why", "how", "what", "when", "where", "who", "which", "can you", "could you", "please explain"
         };
 
+        // CONSTRUCTOR 
         public Response()
         {
             name = null;
         }
 
+        // PROPERTIES and BASIC METHODS
         public void SetUserName(string userName)
         {
             name = userName;
@@ -107,41 +117,59 @@ namespace SecureIQ_Africa
 
         public string GetPersonalizedGreeting()
         {
-            return memory.GetPersonalizedGreeting();
+            string dominant = memory.GetDominantRecentSentiment();
+            string userName = GetUserName();
+            string namePrefix = string.IsNullOrEmpty(userName) ? "" : $"{userName}, ";
+
+            if (dominant == "worried" || dominant == "sad")
+                return $"{namePrefix}I'm here to help you feel more secure. Let's start with something reassuring.";
+            else if (dominant == "angry" || dominant == "frustrated")
+                return $"{namePrefix}I understand you might be frustrated. Let me help you with clear, actionable advice.";
+            else if (dominant == "happy" || dominant == "confident")
+                return $"{namePrefix}Great to see you're in good spirits! Ready to learn more?";
+            else
+                return memory.GetPersonalizedGreeting();
         }
 
-        // ADDED: Basic input validation
+        //  STATIC TOPIC GETTER 
+        private static List<string> _staticTopics = null;
+        public static List<string> GetStaticTopics()
+        {
+            if (_staticTopics == null)
+            {
+                var temp = new SecureData();
+                _staticTopics = temp.secureData.Keys.ToList();
+            }
+            return _staticTopics;
+        }
+        public List<string> GetDataTopics() => GetStaticTopics();
+
+        //  INPUT VALIDATION & CLEANING 
         private bool IsValidInput(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
                 return false;
 
-            // Trim and check length
             input = input.Trim();
             if (input.Length > MAX_INPUT_LENGTH)
                 return false;
 
-            // Check for excessive repetition (more than 20 same characters)
             if (Regex.IsMatch(input, @"(.)\1{20,}"))
                 return false;
 
             return true;
         }
 
-        // ADDED: Clean input
         private string CleanInput(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
 
-            // Trim and limit length
             input = input.Trim();
             if (input.Length > MAX_INPUT_LENGTH)
                 input = input.Substring(0, MAX_INPUT_LENGTH);
 
-            // Remove control characters
             input = Regex.Replace(input, @"[\x00-\x08\x0B\x0C\x0E-\x1F]", "");
-
             return input;
         }
 
@@ -167,10 +195,11 @@ namespace SecureIQ_Africa
             if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
 
-            input = System.Text.RegularExpressions.Regex.Replace(input, @"\s+", " ");
+            input = Regex.Replace(input, @"\s+", " ");
             return input.Trim();
         }
 
+        // RESPONSE DETECTION HELPERS
         private bool IsUserConfused(string input)
         {
             string lowerInput = input.ToLower();
@@ -272,11 +301,12 @@ namespace SecureIQ_Africa
         {
             if (string.IsNullOrWhiteSpace(input)) return true;
             string trimmed = input.Trim();
-            if (trimmed.Length <= 2 && !IsAffirmativeResponse(trimmed) && !IsNegativeResponse(trimmed))
-                return true;
+            if (IsAffirmativeResponse(trimmed) || IsNegativeResponse(trimmed)) return false;
+            if (trimmed.Length <= 2) return true;
             return false;
         }
 
+        // TOPIC & SENTIMENT DETECTION 
         private string DetectTopicFromSynonyms(string userInput)
         {
             if (string.IsNullOrWhiteSpace(userInput)) return null;
@@ -299,76 +329,93 @@ namespace SecureIQ_Africa
 
         private string DetectSentiment(string userInput)
         {
-            string lowerInput = userInput.ToLower();
-
-            // Angry detection
-            if (lowerInput.Contains("angry") || lowerInput.Contains("frustrated") ||
-                lowerInput.Contains("annoying") || lowerInput.Contains("hate") ||
-                lowerInput.Contains("stupid") || lowerInput.Contains("makes me angry") ||
-                lowerInput.Contains("i'm angry") || lowerInput.Contains("im angry") ||
-                lowerInput.Contains("pissed") || lowerInput.Contains("mad"))
-            {
-                return "angry";
-            }
-
-            // Worried detection
-            if (lowerInput.Contains("worried") || lowerInput.Contains("anxious") ||
-                lowerInput.Contains("nervous") || lowerInput.Contains("scared") ||
-                lowerInput.Contains("fear") || lowerInput.Contains("unsafe") ||
-                lowerInput.Contains("stressed") || lowerInput.Contains("overwhelmed") ||
-                lowerInput.Contains("concerned") || lowerInput.Contains("afraid"))
-            {
-                return "worried";
-            }
-
-            // Frustrated detection
-            if (lowerInput.Contains("frustrated") || lowerInput.Contains("confusing") ||
-                lowerInput.Contains("too hard") || lowerInput.Contains("difficult") ||
-                lowerInput.Contains("tired of") || lowerInput.Contains("exhausted") ||
-                lowerInput.Contains("annoyed"))
-            {
-                return "frustrated";
-            }
-
-            // Sad detection
-            if (lowerInput.Contains("sad") || lowerInput.Contains("depressed") ||
-                lowerInput.Contains("upset") || lowerInput.Contains("unhappy") ||
-                lowerInput.Contains("terrible") || lowerInput.Contains("awful") ||
-                lowerInput.Contains("miserable"))
-            {
-                return "sad";
-            }
-
-            // Happy detection
-            if (lowerInput.Contains("happy") || lowerInput.Contains("excited") ||
-                lowerInput.Contains("great") || lowerInput.Contains("awesome") ||
-                lowerInput.Contains("wonderful") || lowerInput.Contains("fantastic") ||
-                lowerInput.Contains("good") || lowerInput.Contains("amazing"))
-            {
-                return "happy";
-            }
-
-            // Curious detection
-            if (lowerInput.Contains("curious") || lowerInput.Contains("interesting") ||
-                lowerInput.Contains("tell me more") || lowerInput.Contains("want to learn") ||
-                lowerInput.Contains("how does") || lowerInput.Contains("why is") ||
-                lowerInput.Contains("what is") || lowerInput.Contains("explain"))
-            {
-                return "curious";
-            }
-
-            // Confident detection
-            if (lowerInput.Contains("got it") || lowerInput.Contains("understand") ||
-                lowerInput.Contains("makes sense") || lowerInput.Contains("clear") ||
-                lowerInput.Contains("i see") || lowerInput.Contains("thanks") ||
-                lowerInput.Contains("thank you"))
-            {
-                return "confident";
-            }
-
-            return "neutral";
+            return SentimentDetector.Detect(userInput);
         }
 
+        private static class SentimentDetector
+        {
+            public static string Detect(string input)
+            {
+                if (string.IsNullOrWhiteSpace(input)) return "neutral";
+
+                string lower = input.ToLower();
+                string[] words = lower.Split(new[] { ' ', '\t', '\r', '\n', '.', ',', '!', '?' },
+                                             StringSplitOptions.RemoveEmptyEntries);
+
+                var sentimentWords = new Dictionary<string, (int score, string sentiment)>
+                {
+                    { "angry", (-3, "angry") }, { "frustrated", (-3, "frustrated") },
+                    { "annoying", (-2, "angry") }, { "hate", (-3, "angry") },
+                    { "mad", (-3, "angry") }, { "pissed", (-3, "angry") },
+                    { "worried", (-3, "worried") }, { "anxious", (-3, "worried") },
+                    { "nervous", (-2, "worried") }, { "scared", (-3, "worried") },
+                    { "fear", (-3, "worried") }, { "stressed", (-2, "worried") },
+                    { "overwhelmed", (-2, "worried") }, { "concerned", (-2, "worried") },
+                    { "sad", (-3, "sad") }, { "depressed", (-3, "sad") },
+                    { "upset", (-2, "sad") }, { "unhappy", (-2, "sad") },
+                    { "terrible", (-3, "sad") }, { "awful", (-3, "sad") },
+                    { "miserable", (-3, "sad") },
+                    { "happy", (3, "happy") }, { "excited", (3, "happy") },
+                    { "great", (3, "happy") }, { "awesome", (3, "happy") },
+                    { "wonderful", (3, "happy") }, { "fantastic", (3, "happy") },
+                    { "good", (2, "happy") }, { "amazing", (3, "happy") },
+                    { "curious", (2, "curious") }, { "interesting", (2, "curious") },
+                    { "learn", (1, "curious") }, { "tell me", (1, "curious") },
+                    { "explain", (1, "curious") },
+                    { "understand", (2, "confident") }, { "got it", (2, "confident") },
+                    { "clear", (2, "confident") }, { "makes sense", (2, "confident") },
+                    { "i see", (1, "confident") }
+                };
+
+                string[] negations = { "not", "no", "never", "don't", "dont", "isn't", "arent", "wasn't" };
+                string[] intensifiers = { "very", "really", "extremely", "so", "too", "quite" };
+
+                var sentimentScores = new Dictionary<string, int>();
+                bool negate = false;
+
+                for (int i = 0; i < words.Length; i++)
+                {
+                    string word = words[i];
+
+                    if (negations.Contains(word))
+                    {
+                        negate = true;
+                        continue;
+                    }
+
+                    int multiplier = 1;
+                    if (intensifiers.Contains(word) && i + 1 < words.Length)
+                    {
+                        string nextWord = words[i + 1];
+                        if (sentimentWords.ContainsKey(nextWord))
+                        {
+                            multiplier = 2;
+                            word = nextWord;
+                            i++;
+                        }
+                    }
+
+                    if (sentimentWords.ContainsKey(word))
+                    {
+                        var (score, sentiment) = sentimentWords[word];
+                        int adjustedScore = score * multiplier * (negate ? -1 : 1);
+                        if (!sentimentScores.ContainsKey(sentiment))
+                            sentimentScores[sentiment] = 0;
+                        sentimentScores[sentiment] += adjustedScore;
+                    }
+
+                    if (negate && !string.IsNullOrEmpty(word))
+                        negate = false;
+                }
+
+                if (sentimentScores.Count == 0)
+                    return "neutral";
+
+                return sentimentScores.OrderByDescending(kvp => kvp.Value).First().Key;
+            }
+        }
+
+        // EMPATHETIC RESPONSES 
         private string GetEmpatheticResponseForEmotion(string emotion, string topic = null)
         {
             string userName = GetUserName();
@@ -427,25 +474,18 @@ namespace SecureIQ_Africa
         {
             switch (emotion)
             {
-                case "angry":
-                    return "What's wrong? I'm here to help with any cybersecurity concerns you have.";
-                case "worried":
-                    return "What specific cybersecurity concern do you have? I'm here to help.";
-                case "frustrated":
-                    return "What specifically is bothering you? Let me try to help.";
-                case "sad":
-                    return "What's making you feel this way? I'd like to help if I can.";
-                case "happy":
-                    return "Would you like to learn more about cybersecurity today?";
-                case "curious":
-                    return "What would you like to learn about?";
-                case "confident":
-                    return "Would you like to test your knowledge or learn something new?";
-                default:
-                    return "How can I help you with cybersecurity today?";
+                case "angry": return "What's wrong? I'm here to help with any cybersecurity concerns you have.";
+                case "worried": return "What specific cybersecurity concern do you have? I'm here to help.";
+                case "frustrated": return "What specifically is bothering you? Let me try to help.";
+                case "sad": return "What's making you feel this way? I'd like to help if I can.";
+                case "happy": return "Would you like to learn more about cybersecurity today?";
+                case "curious": return "What would you like to learn about?";
+                case "confident": return "Would you like to test your knowledge or learn something new?";
+                default: return "How can I help you with cybersecurity today?";
             }
         }
 
+        // TOPIC RESPONSE 
         private string GetResponseForTopic(string topic)
         {
             string baseResponse = "";
@@ -473,14 +513,16 @@ namespace SecureIQ_Africa
             consecutiveNoCount = 0;
             conversationEnded = false;
 
+            _quizOfferedForCurrentTopic = false;
+
             return $"{baseResponse}\n\nHere's a helpful tip:\n{personalizedTip}\n\nWould you like to learn more about {topic}?";
         }
 
+        // MEMORY OPERATIONS 
         private string HandleMemoryOperations(string userInput)
         {
             string normalizedInput = userInput.ToLower().Trim();
 
-            // Check for name question FIRST - HIGHEST PRIORITY
             if (IsNameQuestion(userInput))
             {
                 if (!string.IsNullOrEmpty(GetUserName()))
@@ -490,7 +532,6 @@ namespace SecureIQ_Africa
                 return "I don't know your name yet. Could you please tell me?";
             }
 
-            // Store favorite topic - IMPROVED DETECTION
             bool isFavoriteTopic = normalizedInput.Contains("my favorite topic") ||
                                    normalizedInput.Contains("favorite topic is") ||
                                    normalizedInput.Contains("is my favorite topic") ||
@@ -503,7 +544,6 @@ namespace SecureIQ_Africa
             {
                 string topic = DetectTopicFromSynonyms(normalizedInput);
 
-                // Manual checks for common topics
                 if (topic == null && (normalizedInput.Contains("password safety") || normalizedInput.Contains("password")))
                 {
                     topic = "password";
@@ -547,6 +587,7 @@ namespace SecureIQ_Africa
                     consecutiveNoCount = 0;
                     conversationEnded = false;
                     askingWhatsWrongFor = null;
+                    _quizOfferedForCurrentTopic = false;
 
                     string tip = tips.GetRandomTip(topic, 0);
                     if (string.IsNullOrWhiteSpace(tip))
@@ -560,7 +601,6 @@ namespace SecureIQ_Africa
                 }
             }
 
-            // Recall from memory
             if (memory.IsAskingToRecall(userInput))
             {
                 string recalledInfo = memory.Recall(userInput);
@@ -575,7 +615,6 @@ namespace SecureIQ_Africa
                 return "I remember our conversation! What specific information would you like me to recall?";
             }
 
-            // Conversation summary
             if (normalizedInput.Contains("summary") || normalizedInput.Contains("conversation so far") ||
                 normalizedInput.Contains("what did we talk about"))
             {
@@ -586,7 +625,6 @@ namespace SecureIQ_Africa
                 return memory.GetConversationSummary();
             }
 
-            // Favorite topics recall
             if (normalizedInput.Contains("what do i like") || normalizedInput.Contains("my interests") ||
                 normalizedInput.Contains("topics i ask about") || normalizedInput.Contains("what have i asked") ||
                 normalizedInput.Contains("what is my favorite topic"))
@@ -614,6 +652,7 @@ namespace SecureIQ_Africa
             return null;
         }
 
+        // TIP PROVIDER 
         private string ProvideTip(string topic, bool askForAnother = true)
         {
             string tip = tips.GetRandomTip(topic, followUpCount);
@@ -661,6 +700,7 @@ namespace SecureIQ_Africa
                    "Just ask me about any of these topics!";
         }
 
+        // FAREWELL, GRATITUDE, GOODBYE
         private string GetFarewellResponse()
         {
             conversationEnded = true;
@@ -740,6 +780,7 @@ namespace SecureIQ_Africa
             return responses[random.Next(responses.Length)];
         }
 
+        //  QUESTION HANDLING 
         private string GetQuestionResponse(string question)
         {
             string lowerQuestion = question.ToLower();
@@ -767,9 +808,169 @@ namespace SecureIQ_Africa
             return "That's a great question! Could you tell me more specifically what you'd like to know about cybersecurity?";
         }
 
+        // SIMPLIFIED EXPLANATION 
+        private string GetSimplifiedExplanation(string topic)
+        {
+            switch (topic)
+            {
+                case "password":
+                    return "Let me explain simply: A strong password is like a good lock on your front door. Make it long (12+ characters), mix letters and numbers, and never reuse passwords. Simple enough?";
+                case "phishing":
+                    return "Think of phishing like a fake phone call from someone pretending to be your bank. Scammers send fake emails trying to trick you. Always check who's really asking! Make sense?";
+                case "malware":
+                    return "Malware is like a computer virus - bad software that can damage your device. Avoid downloading suspicious files. Does that help?";
+                case "wifi":
+                    return "WiFi security is about protecting your wireless network. Think of it like locking your front door - make sure only trusted people can use your internet.";
+                case "vpn":
+                    return "A VPN is like a secret tunnel for your internet traffic. It hides what you're doing online from others, especially on public WiFi.";
+                case "2fa":
+                    return "2FA is like having both a key AND a code to open a safe. Even if someone steals your password, they still need the code from your phone.";
+                default:
+                    return $"Let me explain {topic} in simpler terms. What specific part confuses you?";
+            }
+        }
+
+        //  MANUAL TASK REQUEST PARSER 
+        private (bool isTask, string description) ParseTaskRequest(string input)
+        {
+            string lower = input.ToLower().Trim();
+
+            // Explicit starts
+            if (lower.StartsWith("add task"))
+            {
+                string desc = input.Substring("add task".Length).Trim();
+                return (true, desc);
+            }
+            if (lower.StartsWith("new task"))
+            {
+                string desc = input.Substring("new task".Length).Trim();
+                return (true, desc);
+            }
+            if (lower.StartsWith("remind me to"))
+            {
+                string desc = input.Substring("remind me to".Length).Trim();
+                return (true, desc);
+            }
+            if (lower.StartsWith("remind me"))
+            {
+                string desc = input.Substring("remind me".Length).Trim();
+                return (true, desc);
+            }
+
+            // Contains patterns
+            if (lower.Contains("create a task"))
+            {
+                int idx = lower.IndexOf("create a task") + "create a task".Length;
+                string desc = input.Substring(idx).Trim();
+                return (true, desc);
+            }
+
+            // Generic: "task" + "add/create/new"
+            if (lower.Contains("task") && (lower.Contains("add") || lower.Contains("create") || lower.Contains("new")))
+            {
+                string cleaned = input;
+                foreach (var prefix in new[] { "add a ", "create a ", "new " })
+                {
+                    if (lower.Contains(prefix))
+                    {
+                        int idx = lower.IndexOf(prefix) + prefix.Length;
+                        cleaned = input.Substring(idx).Trim();
+                        break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(cleaned) && cleaned != input)
+                    return (true, cleaned);
+            }
+
+            return (false, null);
+        }
+
+        // CACHE 
+        private void CacheResponse(string input, string response)
+        {
+            if (responseCache.Count < 100 && !responseCache.ContainsKey(input))
+            {
+                responseCache[input] = response;
+            }
+        }
+
+        public void ResetCache()
+        {
+            responseCache.Clear();
+        }
+
+        public void ResetConversation()
+        {
+            currentTopic = null;
+            followUpCount = 0;
+            expectedResponse = null;
+            lastQuestion = null;
+            consecutiveUnknownResponses = 0;
+            consecutiveNoCount = 0;
+            conversationEnded = false;
+            askingWhatsWrongFor = null;
+            responseCache.Clear();
+            consecutiveInvalidInputs = 0;
+            _pendingQuiz = false;
+            _pendingQuizTopic = null;
+            _quizOfferTopic = null;
+            _quizOfferedForCurrentTopic = false;
+        }
+
+        public Memory GetMemory()
+        {
+            return memory;
+        }
+
+        public void ClearMemory()
+        {
+            memory.ClearMemory();
+            ResetConversation();
+        }
+
+        //  EXPOSE TASK MANAGER FOR UI
+        public TaskManager GetTaskManager() => taskManager;
+
+        //  QUIZ GENERATOR fallback 
+        private string GenerateQuizQuestion(string topic = null)
+        {
+            var quizQuestions = new Dictionary<string, (string question, string answer, string[] options)[]>
+            {
+                ["phishing"] = new[]
+                {
+                    ("What is phishing?",
+                     "A fraudulent attempt to obtain sensitive information",
+                     new[] { "A type of virus", "A fraudulent attempt to obtain sensitive information", "A hardware failure", "A network protocol" })
+                },
+                ["password"] = new[]
+                {
+                    ("What is a strong password practice?",
+                     "Use a mix of uppercase, lowercase, numbers, and symbols",
+                     new[] { "Use your birthday", "Use a mix of uppercase, lowercase, numbers, and symbols", "Use the same password everywhere", "Use only numbers" })
+                },
+                ["2fa"] = new[]
+                {
+                    ("What is 2FA?",
+                     "An extra layer of security requiring two forms of verification",
+                     new[] { "A type of malware", "An extra layer of security requiring two forms of verification", "A password manager", "A network encryption method" })
+                }
+            };
+
+            if (string.IsNullOrEmpty(topic) || !quizQuestions.ContainsKey(topic))
+            {
+                var keys = quizQuestions.Keys.ToList();
+                topic = keys[new Random().Next(keys.Count)];
+            }
+
+            var q = quizQuestions[topic][0];
+            string optionsStr = string.Join("\n", q.options.Select((o, i) => $"{i + 1}. {o}"));
+            return $" Quiz on {topic}:\n{q.question}\n{optionsStr}";
+        }
+
+        //  MAIN GetResponse method
         public string GetResponse(string userInput)
         {
-            // ADDED: Input validation at the start
+            // Input validation
             if (!IsValidInput(userInput))
             {
                 consecutiveInvalidInputs++;
@@ -781,16 +982,126 @@ namespace SecureIQ_Africa
                 return "I didn't understand that. Could you please ask me about cybersecurity topics like passwords, phishing, or online safety?";
             }
 
-            // ADDED: Clean the input
             userInput = CleanInput(userInput);
-
-            // Reset counter for valid input
             consecutiveInvalidInputs = 0;
-
-            // Original code continues unchanged
             userInput = SanitizeInput(userInput);
 
-            // If conversation ended but user asks a question, restart conversation
+            // INTENT DETECTION (NLP) – returns Intent object with sentiment
+            NLPEngine.Intent intent = nlpEngine.ParseIntent(userInput);
+
+            // Use NLP sentiment if available, otherwise fallback to rule-based
+            string sentiment = !string.IsNullOrEmpty(intent.Sentiment) ? intent.Sentiment : DetectSentiment(userInput);
+            // Store sentiment in memory for personalisation
+            memory.StoreSentiment(sentiment);
+
+            // Process intents
+            if (intent.Type != NLPEngine.IntentType.None)
+            {
+                switch (intent.Type)
+                {
+                    case NLPEngine.IntentType.Task:
+                        taskManager.AddTask(intent.Action);
+                        _openTaskManager = true;   // Signal UI to open TaskManagerWindow
+                        string taskMsg = $"Task added: \"{intent.Action}\". I'll remind you later.";
+                        CacheResponse(userInput.ToLower(), taskMsg);
+                        memory.SetLastBotResponse(taskMsg);
+                        return taskMsg;
+
+                    case NLPEngine.IntentType.Reminder:
+                        taskManager.AddTask(intent.Action);
+                        _openTaskManager = true;   // Signal UI to open TaskManagerWindow
+                        string reminderMsg = $"Reminder set: \"{intent.Action}\".";
+                        CacheResponse(userInput.ToLower(), reminderMsg);
+                        memory.SetLastBotResponse(reminderMsg);
+                        return reminderMsg;
+
+                    case NLPEngine.IntentType.ListTasks:
+                        _openTaskManager = true;   // Signal UI to open TaskManagerWindow
+                        string listMsg = taskManager.FormatTaskList();
+                        CacheResponse(userInput.ToLower(), listMsg);
+                        memory.SetLastBotResponse(listMsg);
+                        return listMsg;
+
+                    case NLPEngine.IntentType.DeleteTask:
+                        _openTaskManager = true;   // Signal UI to open TaskManagerWindow
+                        if (intent.Action != null && int.TryParse(intent.Action, out int idx))
+                        {
+                            if (taskManager.DeleteTask(idx - 1))
+                            {
+                                string delMsg = $"Task {idx} deleted.";
+                                CacheResponse(userInput.ToLower(), delMsg);
+                                memory.SetLastBotResponse(delMsg);
+                                return delMsg;
+                            }
+                            else
+                            {
+                                string failMsg = $"Could not delete task {idx}. Please check the number.";
+                                CacheResponse(userInput.ToLower(), failMsg);
+                                memory.SetLastBotResponse(failMsg);
+                                return failMsg;
+                            }
+                        }
+                        else
+                        {
+                            taskManager.ClearTasks();
+                            string clearMsg = "All tasks cleared.";
+                            CacheResponse(userInput.ToLower(), clearMsg);
+                            memory.SetLastBotResponse(clearMsg);
+                            return clearMsg;
+                        }
+
+                    // QUIZ CONFIRMATION CHANGE: Instead of setting _pendingQuiz immediately,
+                    // we ask for confirmation first.
+                    case NLPEngine.IntentType.Quiz:
+                        _pendingQuizTopic = intent.Topic;   // store the topic (may be null)
+                        expectedResponse = "quiz_confirmation";
+                        string quizMsg = "Let's test your cybersecurity knowledge! Would you like to start the quiz?";
+                        CacheResponse(userInput.ToLower(), quizMsg);
+                        memory.SetLastBotResponse(quizMsg);
+                        return quizMsg;
+                }
+            }
+
+            // TASK REQUEST PARSING 
+            if (intent.Type == NLPEngine.IntentType.None)
+            {
+                var (isTask, description) = ParseTaskRequest(userInput);
+                if (isTask)
+                {
+                    if (!string.IsNullOrEmpty(description))
+                    {
+                        taskManager.AddTask(description);
+                        _openTaskManager = true;
+                        string msg = $"Task added: \"{description}\". I'll remind you later.";
+                        CacheResponse(userInput.ToLower(), msg);
+                        memory.SetLastBotResponse(msg);
+                        return msg;
+                    }
+                    else
+                    {
+                        _openTaskManager = true;
+                        string msg = "I'll open the task manager for you. Please add your task there.";
+                        CacheResponse(userInput.ToLower(), msg);
+                        memory.SetLastBotResponse(msg);
+                        return msg;
+                    }
+                }
+            }
+
+            // QUIZ OFFER LOGIC after intent processing
+            if (currentTopic != null && followUpCount >= 3 && !_quizOfferedForCurrentTopic
+                && expectedResponse == null && !conversationEnded)
+            {
+                _quizOfferTopic = currentTopic;
+                _quizOfferedForCurrentTopic = true;
+                expectedResponse = "quiz_offer";
+                lastQuestion = $"Would you like to test your knowledge with a quick quiz on {currentTopic}?";
+                string offerResponse = $"You've learned a lot about {currentTopic}! {lastQuestion}";
+                CacheResponse(userInput.ToLower(), offerResponse);
+                memory.SetLastBotResponse(offerResponse);
+                return offerResponse;
+            }
+
             if (conversationEnded)
             {
                 if (IsQuestionWord(userInput) || IsGreeting(userInput) || IsHelpRequest(userInput) ||
@@ -821,7 +1132,6 @@ namespace SecureIQ_Africa
                 }
             }
 
-            // Handle farewells 
             if (IsFarewell(userInput))
             {
                 string response = GetFarewellResponse();
@@ -830,7 +1140,6 @@ namespace SecureIQ_Africa
                 return response;
             }
 
-            // Handle gratitude
             if (IsGratitude(userInput))
             {
                 expectedResponse = null;
@@ -841,7 +1150,6 @@ namespace SecureIQ_Africa
                 return response;
             }
 
-            // Handle conversation ending phrases
             if (IsConversationEnding(userInput))
             {
                 string response = GetFinalGoodbye();
@@ -850,7 +1158,41 @@ namespace SecureIQ_Africa
                 return response;
             }
 
-            // Proirity Memory operations including favorite topic and name recall
+            // QUIZ CONFIRMATION HANDLING 
+            if (expectedResponse == "quiz_confirmation")
+            {
+                if (IsAffirmativeResponse(userInput))
+                {
+                    _pendingQuiz = true;
+                    expectedResponse = null;
+                    Quiz quiz = new Quiz();
+                    quiz.Show();
+
+                    string confirmMsg = string.IsNullOrEmpty(_pendingQuizTopic)
+                        ? "Great! Let's start the quiz."
+                        : $"Great! Let's start the quiz on {_pendingQuizTopic}.";
+                    CacheResponse(userInput.ToLower(), confirmMsg);
+                    memory.SetLastBotResponse(confirmMsg);
+                    return confirmMsg;
+                }
+                else if (IsNegativeResponse(userInput))
+                {
+                    expectedResponse = null;
+                    string noMsg = "No problem! What would you like to learn about instead?\n\n" + GetTopicSuggestions();
+                    CacheResponse(userInput.ToLower(), noMsg);
+                    memory.SetLastBotResponse(noMsg);
+                    return noMsg;
+                }
+                else
+                {
+                    // If user says something else, repeat the question
+                    string repeatMsg = "Would you like to start the quiz? Please answer yes or no.";
+                    CacheResponse(userInput.ToLower(), repeatMsg);
+                    memory.SetLastBotResponse(repeatMsg);
+                    return repeatMsg;
+                }
+            }
+
             string memoryResponse = HandleMemoryOperations(userInput);
             if (memoryResponse != null)
             {
@@ -859,11 +1201,9 @@ namespace SecureIQ_Africa
                 return memoryResponse;
             }
 
-            // Detect sentiment and topic
-            string sentiment = DetectSentiment(userInput);
             string detectedTopic = DetectTopicFromSynonyms(userInput);
 
-            // HANDLE RESPONSE TO "WHAT'S WRONG?" 
+            // Handle asking "what's wrong" state
             if (expectedResponse == "asking_whats_wrong" && !string.IsNullOrEmpty(askingWhatsWrongFor))
             {
                 string userLower = userInput.ToLower();
@@ -876,6 +1216,7 @@ namespace SecureIQ_Africa
                     followUpCount = 0;
                     expectedResponse = "another_tip";
                     askingWhatsWrongFor = null;
+                    _quizOfferedForCurrentTopic = false;
 
                     string tip = tips.GetRandomTip(detectedIssueTopic, 0);
                     string personalizedTip = memory.GetPersonalizedResponse(detectedIssueTopic, tip);
@@ -905,7 +1246,7 @@ namespace SecureIQ_Africa
                 return defaultResponse;
             }
 
-            //  HANDLE ALL EMOTIONS WITHOUT TOPIC 
+            // Emotional responses without a topic
             if ((sentiment == "angry" || sentiment == "worried" || sentiment == "frustrated" ||
                  sentiment == "sad") && detectedTopic == null)
             {
@@ -952,7 +1293,7 @@ namespace SecureIQ_Africa
                 return response;
             }
 
-            // HANDLE ALL EMOTIONS WITH TOPIC 
+            // Emotion + topic detected
             if ((sentiment == "angry" || sentiment == "worried" || sentiment == "frustrated" ||
                  sentiment == "sad" || sentiment == "happy" || sentiment == "curious" ||
                  sentiment == "confident") && detectedTopic != null)
@@ -960,6 +1301,7 @@ namespace SecureIQ_Africa
                 currentTopic = detectedTopic;
                 followUpCount = 0;
                 conversationEnded = false;
+                _quizOfferedForCurrentTopic = false;
 
                 string tip = tips.GetRandomTip(detectedTopic, 0);
                 string personalizedTip = memory.GetPersonalizedResponse(detectedTopic, tip);
@@ -983,7 +1325,6 @@ namespace SecureIQ_Africa
                 }
             }
 
-            // Handle question words
             if (IsQuestionWord(userInput) && currentTopic == null && expectedResponse == null)
             {
                 string response = GetQuestionResponse(userInput);
@@ -1017,6 +1358,7 @@ namespace SecureIQ_Africa
 
             if (singleWordTopic != null && userInput.Split(' ').Length <= 3)
             {
+                _quizOfferedForCurrentTopic = false;
                 string response = GetResponseForTopic(singleWordTopic);
                 CacheResponse(userInput.ToLower(), response);
                 memory.SetLastBotResponse(response);
@@ -1029,6 +1371,7 @@ namespace SecureIQ_Africa
                 followUpCount = 0;
                 consecutiveNoCount = 0;
                 conversationEnded = false;
+                _quizOfferedForCurrentTopic = false;
 
                 string tip = tips.GetRandomTip(detectedTopic, 0);
                 string personalizedTip = memory.GetPersonalizedResponse(detectedTopic, tip);
@@ -1070,6 +1413,19 @@ namespace SecureIQ_Africa
                 consecutiveNoCount = 0;
                 conversationEnded = false;
 
+                if (expectedResponse == "quiz_offer" && !string.IsNullOrEmpty(_quizOfferTopic))
+                {
+                    _pendingQuiz = true;
+                    _pendingQuizTopic = _quizOfferTopic;
+                    expectedResponse = null;
+                    string topicForQuiz = _quizOfferTopic;
+                    _quizOfferTopic = null;
+                    string response = $"Great! Let's start the quiz on {topicForQuiz}.";
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
+
                 if (expectedResponse == "learn_more" && currentTopic != null)
                 {
                     string response = ProvideTip(currentTopic, true);
@@ -1103,11 +1459,21 @@ namespace SecureIQ_Africa
                 }
             }
 
-            // Handle "no" response
             if (IsNegativeResponse(userInput))
             {
                 consecutiveNoCount++;
                 conversationEnded = false;
+
+                // QUIZ CONFIRMATION is already handled above, but also check for quiz_offer
+                if (expectedResponse == "quiz_offer")
+                {
+                    expectedResponse = null;
+                    _quizOfferTopic = null;
+                    string response = "No problem! Feel free to ask me any cybersecurity questions. What would you like to learn about?";
+                    CacheResponse(userInput.ToLower(), response);
+                    memory.SetLastBotResponse(response);
+                    return response;
+                }
 
                 if (consecutiveNoCount >= 2)
                 {
@@ -1192,6 +1558,7 @@ namespace SecureIQ_Africa
                         followUpCount = 0;
                         consecutiveNoCount = 0;
                         conversationEnded = false;
+                        _quizOfferedForCurrentTopic = false;
 
                         string baseResponse = item.Value.response;
                         string tip = tips.GetRandomTip(currentTopic, 0);
@@ -1289,81 +1656,34 @@ namespace SecureIQ_Africa
             return fallback;
         }
 
-        private string GetSimplifiedExplanation(string topic)
-        {
-            switch (topic)
-            {
-                case "password":
-                    return "Let me explain simply: A strong password is like a good lock on your front door. Make it long (12+ characters), mix letters and numbers, and never reuse passwords. Simple enough?";
-                case "phishing":
-                    return "Think of phishing like a fake phone call from someone pretending to be your bank. Scammers send fake emails trying to trick you. Always check who's really asking! Make sense?";
-                case "malware":
-                    return "Malware is like a computer virus - bad software that can damage your device. Avoid downloading suspicious files. Does that help?";
-                case "wifi":
-                    return "WiFi security is about protecting your wireless network. Think of it like locking your front door - make sure only trusted people can use your internet.";
-                case "vpn":
-                    return "A VPN is like a secret tunnel for your internet traffic. It hides what you're doing online from others, especially on public WiFi.";
-                case "2fa":
-                    return "2FA is like having both a key AND a code to open a safe. Even if someone steals your password, they still need the code from your phone.";
-                default:
-                    return $"Let me explain {topic} in simpler terms. What specific part confuses you?";
-            }
-        }
-
-        private void CacheResponse(string input, string response)
-        {
-            if (responseCache.Count < 100 && !responseCache.ContainsKey(input))
-            {
-                responseCache[input] = response;
-            }
-        }
-
-        public void ResetCache()
-        {
-            responseCache.Clear();
-        }
-
-        public void ResetConversation()
-        {
-            currentTopic = null;
-            followUpCount = 0;
-            expectedResponse = null;
-            lastQuestion = null;
-            consecutiveUnknownResponses = 0;
-            consecutiveNoCount = 0;
-            conversationEnded = false;
-            askingWhatsWrongFor = null;
-            responseCache.Clear();
-            consecutiveInvalidInputs = 0; // ADDED
-        }
-
-        public Memory GetMemory()
-        {
-            return memory;
-        }
-
-        public void ClearMemory()
-        {
-            memory.ClearMemory();
-            ResetConversation();
-        }
-
+        // PROCESS MESSAGE 
         public ChatResponse ProcessMessage(string userMessage)
         {
             string responseMessage = GetResponse(userMessage);
             List<string> topics = memory.GetFavoriteTopics();
 
-            return new ChatResponse
+            var chatResponse = new ChatResponse
             {
                 Message = responseMessage,
                 UserName = GetUserName(),
                 FavoriteTopics = topics,
                 HasInterests = topics.Any(),
-                SuggestedTopic = memory.SuggestTopic()
+                SuggestedTopic = memory.SuggestTopic(),
+                LaunchQuiz = _pendingQuiz,
+                QuizTopic = _pendingQuizTopic,
+                OpenTaskManager = _openTaskManager   // Carry the flag to UI
             };
+
+            // Reset flags after use
+            _pendingQuiz = false;
+            _pendingQuizTopic = null;
+            _openTaskManager = false;   // Reset after sending to UI
+
+            return chatResponse;
         }
     }
 
+    // ----- CHAT RESPONSE DTO -----
     public class ChatResponse
     {
         public string Message { get; set; }
@@ -1371,5 +1691,8 @@ namespace SecureIQ_Africa
         public List<string> FavoriteTopics { get; set; }
         public bool HasInterests { get; set; }
         public string SuggestedTopic { get; set; }
+        public bool LaunchQuiz { get; set; }
+        public string QuizTopic { get; set; }
+        public bool OpenTaskManager { get; set; }   // NEW: signal to open TaskManagerWindow
     }
 }

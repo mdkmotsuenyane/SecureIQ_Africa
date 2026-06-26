@@ -803,3 +803,243 @@ Would you like to learn more about wifi?
 Since you're interested in wifi, would you like to learn more about wifi? Or I can suggest another topic like passwords, phishing, or malware protection.
 2026-05-29 12:59:23 - Keoratile: thank you bye
 2026-05-29 12:59:25 - Bot: Goodbye Keoratile! Stay safe online. Feel free to come back anytime you have cybersecurity questions.
+2026-06-24 23:34:44 - Remo: what is phishing
+2026-06-24 23:34:46 - Bot: Remo, Great curiosity about phishing! Let me share something interesting.
+
+When in doubt, go directly to the website by typing the URL yourself, not clicking the link.
+
+Would you like to learn more about phishing?
+2026-06-25 01:58:01 - Keo: im sad
+2026-06-25 01:58:03 - Bot: Keo, I'm sorry you're feeling down. What's making you feel this way? I'd like to help if I can.
+2026-06-25 01:58:19 - Keo: i dont like phishing
+2026-06-25 01:58:21 - Bot: Keo, I'm sorry phishing is making you feel this way. Let me share something that might help improve the situation.
+
+Check the sender's email address carefully - scammers use addresses that look almost real.
+
+Would you like another tip?
+2026-06-25 01:58:33 - Keo: no
+2026-06-25 01:58:35 - Bot: Okay! Would you like to learn about a different cybersecurity topic?
+
+What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-25 01:58:47 - Keo: quiz
+2026-06-25 01:58:47 - Keo: quiz
+2026-06-25 01:58:49 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-25 01:58:49 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-25 01:59:13 - Keo: i want to take a quiz
+2026-06-25 01:59:15 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-25 14:45:09 - Phalane: i think i understand everthing
+2026-06-25 14:45:11 - Bot: That's great! Would you like to learn about another cybersecurity topic?
+2026-06-25 14:45:28 - Phalane: i want to take a quiz
+2026-06-25 14:45:30 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 01:39:50 - F: i want to know about phishing
+2026-06-26 01:39:52 - Bot: Phishing is the fraudulent practice of sending emails or other messages purporting to be from reputable companies in order to induce individuals to reveal personal information, such as passwords and credit card numbers.
+Watch out for emails or messages asking for personal info. When in doubt, don't click links.
+
+Would you like me to share some tips about phishing?
+2026-06-26 01:40:06 - F: nothing its fine
+2026-06-26 01:40:08 - Bot: Would you like to learn more about phishing or try a different topic?
+2026-06-26 01:40:30 - F: i love social media
+2026-06-26 01:40:32 - Bot: Would you like to learn more about phishing or try a different topic?
+2026-06-26 01:40:45 - F: wifi
+2026-06-26 01:40:47 - Bot: Wifi is a facility allowing computers, smartphones, or other devices to connect to the internet or communicate with one another wirelessly within a particular area.
+Public Wi-Fi can be risky. Avoid online banking or shopping, or use a VPN.
+
+Here's a helpful tip:
+Use a VPN when connecting to public Wi-Fi networks like in cafes or airports.
+
+Would you like to learn more about wifi?
+2026-06-26 01:41:01 - F: yes l love wifi
+2026-06-26 01:41:03 - Bot: Wifi is a facility allowing computers, smartphones, or other devices to connect to the internet or communicate with one another wirelessly within a particular area.
+Public Wi-Fi can be risky. Avoid online banking or shopping, or use a VPN.
+
+Would you like me to share some tips about wifi?
+2026-06-26 08:59:21 - Thabo: i love phishing
+2026-06-26 08:59:23 - Bot: Great! I'll remember that you're interested in phishing. It's a crucial part of staying safe online.
+
+As someone interested in phishing, here's a helpful tip:
+Look for urgent language like 'act now' or 'your account will be closed' - that's a red flag!
+
+Would you like to learn more about phishing?
+2026-06-26 08:59:37 - Thabo: no
+2026-06-26 08:59:39 - Bot: No problem! What other cybersecurity topic would you like to learn about?
+
+Since you're interested in phishing, would you like to learn more about phishing? Or I can suggest another topic like passwords, phishing, or malware protection.
+2026-06-26 09:00:12 - Thabo: i want to take a quiz
+2026-06-26 09:00:14 - Bot: Would you like to learn more about phishing?
+2026-06-26 09:10:07 - Yusuf: i want to take a quiz
+2026-06-26 09:10:09 - Bot: Let's test your cybersecurity knowledge!
+2026-06-26 09:10:21 - Yusuf: sure
+2026-06-26 09:10:23 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 09:20:22 - t: i want to take a quiz
+2026-06-26 09:20:24 - Bot: Let's test your cybersecurity knowledge! Would you like to start the quiz?
+2026-06-26 09:20:37 - t: sure
+2026-06-26 09:20:39 - Bot: Great! Let's start the quiz.
+2026-06-26 09:20:48 - t: yeah
+2026-06-26 09:20:50 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 09:21:09 - t: i want to take a quiz
+2026-06-26 09:21:11 - Bot: Let's test your cybersecurity knowledge! Would you like to start the quiz?
+2026-06-26 09:21:18 - t: sure
+2026-06-26 09:21:20 - Bot: Great! Let's start the quiz.
+2026-06-26 09:21:24 - t: sure
+2026-06-26 09:21:26 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 09:30:23 - y: i want to take a quiz
+2026-06-26 09:30:25 - Bot: Let's test your cybersecurity knowledge! Would you like to start the quiz?
+2026-06-26 09:30:31 - y: yes
+2026-06-26 09:30:33 - Bot: Great! Let's start the quiz.
+2026-06-26 09:40:48 - y: add task
+2026-06-26 09:40:50 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 09:41:13 - y: add task
+2026-06-26 09:41:15 - y: add task
+2026-06-26 09:41:15 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 09:41:17 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 09:47:03 - Mokadi: add task
+2026-06-26 09:47:05 - Bot: I'll open the task manager for you. Please add your task there.
+2026-06-26 09:47:15 - Mokadi: okay
+2026-06-26 09:47:17 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 09:50:02 - SGA: add task
+2026-06-26 09:50:04 - Bot: I'll open the task manager for you. Please add your task there.
+2026-06-26 10:11:06 - SecureIQ: i want to take a quiz
+2026-06-26 10:11:08 - Bot: Let's test your cybersecurity knowledge! Would you like to start the quiz?
+2026-06-26 10:11:16 - SecureIQ: yes
+2026-06-26 10:11:18 - Bot: Great! Let's start the quiz.
+2026-06-26 10:21:23 - Tumi: what is  my name
+2026-06-26 10:21:25 - Bot: Your name is Tumi! I remember you told me earlier.
+2026-06-26 10:21:30 - Tumi: okay
+2026-06-26 10:21:32 - Bot: What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 10:21:42 - Tumi: phishing
+2026-06-26 10:21:44 - Bot: Phishing is the fraudulent practice of sending emails or other messages purporting to be from reputable companies in order to induce individuals to reveal personal information, such as passwords and credit card numbers.
+Watch out for emails or messages asking for personal info. When in doubt, don't click links.
+
+Here's a helpful tip:
+Look for urgent language like 'act now' or 'your account will be closed' - that's a red flag!
+
+Would you like to learn more about phishing?
+2026-06-26 10:21:50 - Tumi: no
+2026-06-26 10:21:52 - Bot: No problem! What other cybersecurity topic would you like to learn about?
+
+What cybersecurity topic would you like to learn about? I can help with:
+- Password security
+- Phishing detection (spotting scams and fake emails)
+- Malware protection
+- WiFi security
+- VPNs and privacy
+- Two-factor authentication (2FA)
+
+Just ask me about any of these topics!
+2026-06-26 10:22:12 - Tumi: i love wifi
+2026-06-26 10:22:14 - Bot: Great! I'll remember that you're interested in wifi. It's a crucial part of staying safe online.
+
+As someone interested in wifi, here's a helpful tip:
+Always use WPA2 or WPA3 encryption on your home Wi-Fi network - never use WEP or open networks.
+
+Would you like to learn more about wifi?
+2026-06-26 10:22:30 - Tumi: i want to take a quiz
+2026-06-26 10:22:32 - Bot: Let's test your cybersecurity knowledge! Would you like to start the quiz?
+2026-06-26 10:22:41 - Tumi: sure
+2026-06-26 10:22:43 - Bot: Great! Let's start the quiz.
+2026-06-26 10:23:06 - Tumi: thank you
+2026-06-26 10:23:08 - Bot: Happy to help, Tumi! Is there another cybersecurity topic you'd like to explore?

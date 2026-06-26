@@ -21,6 +21,10 @@ namespace SecureIQ_Africa
         private int interactionCount = 0;
         private static readonly Random random = new Random();
 
+        // NEW: sentiment history
+        private List<string> sentimentHistory = new List<string>();
+        private const int MaxSentimentHistory = 10;
+
         public Memory()
         {
             InitializeTopicContext();
@@ -380,6 +384,7 @@ namespace SecureIQ_Africa
             lastUserMessage = "";
             lastBotResponse = "";
             interactionCount = 0;
+            sentimentHistory.Clear();   // added
         }
 
         public bool IsAskingToRecall(string userInput)
@@ -410,5 +415,32 @@ namespace SecureIQ_Africa
         {
             return interactionCount;
         }
+
+        // ---- NEW SENTIMENT METHODS ----
+        public void StoreSentiment(string sentiment)
+        {
+            if (string.IsNullOrEmpty(sentiment) || sentiment == "neutral")
+                return;
+            sentimentHistory.Add(sentiment);
+            if (sentimentHistory.Count > MaxSentimentHistory)
+                sentimentHistory.RemoveAt(0);
+        }
+
+        public string GetDominantRecentSentiment()
+        {
+            if (sentimentHistory.Count == 0) return "neutral";
+            return sentimentHistory.GroupBy(s => s)
+                                   .OrderByDescending(g => g.Count())
+                                   .First().Key;
+        }
+
+        public string GetSentimentSummary()
+        {
+            if (sentimentHistory.Count == 0) return "No emotional data yet.";
+            var dominant = GetDominantRecentSentiment();
+            return $"You've been feeling {dominant} recently.";
+        }
+
+        public void ClearSentimentHistory() => sentimentHistory.Clear();
     }
 }

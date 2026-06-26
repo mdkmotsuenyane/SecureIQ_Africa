@@ -26,20 +26,17 @@ namespace SecureIQ_Africa
         private bool isStored = false;
         private Response responseHandler;
         private string historyFile = "History/chat_history.txt";
+        private Window menuWindow;
 
-        // constructor that accepts username 
-        public SecureIQChatWindow(string userName)
+        public SecureIQChatWindow(string userName, Window menuWin = null)
         {
             InitializeComponent();
-            this.username = userName ?? "Guest"; // Handle null username
+            this.username = userName ?? "Guest";
+            this.menuWindow = menuWin;
 
-            // Initialize the response handler
             responseHandler = new Response();
-
-            // Set the username properly using the method
             responseHandler.SetUserName(username);
 
-            // Ensure History directory exists
             try
             {
                 Directory.CreateDirectory("History");
@@ -52,41 +49,47 @@ namespace SecureIQ_Africa
             Greeting();
         }
 
-        //voice greeting system 
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Log session closure
+            ActivityLogExtensions.LogCustom($"Chat session closed for {username}");
+
+            this.Close();
+
+            if (menuWindow != null)
+            {
+                menuWindow.Show();
+                menuWindow.Activate();
+            }
+            else
+            {
+                foreach (Window win in Application.Current.Windows)
+                {
+                    if (win is Menu && win != this)
+                    {
+                        win.Show();
+                        win.Activate();
+                        break;
+                    }
+                }
+            }
+        }
+
         private async void Greeting()
         {
-            try
-            {
-                // Check if file exists before trying to play
-                string soundPath = "C:\\Users\\Lenovo\\source\\repos\\SecureIQ-Africa\\SecureIQ-Africa\\SecureIQ.wav";
-                if (File.Exists(soundPath))
-                {
-                    SoundPlayer player = new SoundPlayer(soundPath);
-                    player.Play();
-                }
-                else
-                {
-                    // Handle missing sound file gracefully
-                    Console.WriteLine("Sound file not found: " + soundPath);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error playing sound: {ex.Message}");
-            }
-
-            // Get personalized greeting from the Response class
             string greeting = responseHandler.GetPersonalizedGreeting();
             if (string.IsNullOrEmpty(greeting))
             {
                 greeting = $"Welcome, {username}! We are here to answer your cybersecurity-related questions.";
             }
 
+            // Log chat start
+            ActivityLogExtensions.LogCustom($"Chat session started for {username}");
+
             await TypingAnimation();
             BotMessage(greeting);
         }
 
-        //events that happen after the button is clicked 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -98,24 +101,23 @@ namespace SecureIQ_Africa
                     return;
                 }
 
-                // Display user message
-                ChatMessage(userMessage);
+                // Log user message
+                ActivityLogExtensions.LogCustom($"User ({username}): {userMessage}");
 
-                // Save to history
+                ChatMessage(userMessage);
                 SaveMessage(username, userMessage);
                 isStored = true;
 
-                // Call typing effect
                 await TypingAnimation();
 
-                // Get and display bot response
                 string response = responseHandler.GetResponse(userMessage);
                 BotMessage(response);
                 SaveMessage("Bot", response);
 
-                // Clear input
+                // Log bot response
+                ActivityLogExtensions.LogCustom($"Bot: {response}");
+
                 userInput.Clear();
-                // Return focus to input field
                 userInput.Focus();
             }
             catch (Exception ex)
@@ -125,10 +127,8 @@ namespace SecureIQ_Africa
             }
         }
 
-        //Bot Message 
         public void BotMessage(string message)
         {
-
             Dispatcher.Invoke(() =>
             {
                 StackPanel stack = new StackPanel();
@@ -164,7 +164,6 @@ namespace SecureIQ_Africa
 
                 ChatPanel.Children.Add(stack);
 
-                // Auto-scroll to bottom
                 ScrollViewer scrollViewer = FindScrollViewer(ChatPanel);
                 if (scrollViewer != null)
                 {
@@ -173,7 +172,6 @@ namespace SecureIQ_Africa
             });
         }
 
-        //Chat Message 
         public void ChatMessage(string message)
         {
             Dispatcher.Invoke(() =>
@@ -215,7 +213,6 @@ namespace SecureIQ_Africa
 
                 ChatPanel.Children.Add(stack);
 
-                // Auto-scroll to bottom
                 ScrollViewer scrollViewer = FindScrollViewer(ChatPanel);
                 if (scrollViewer != null)
                 {
@@ -224,7 +221,6 @@ namespace SecureIQ_Africa
             });
         }
 
-        // Helper method to find ScrollViewer in the visual tree
         private ScrollViewer FindScrollViewer(DependencyObject parent)
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
@@ -240,21 +236,17 @@ namespace SecureIQ_Africa
             return null;
         }
 
-        //saving history 
         private void SaveMessage(string user, string message)
         {
             try
             {
-                // Ensure directory exists before saving
                 Directory.CreateDirectory("History");
-
                 string line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {user}: {message}";
                 File.AppendAllText(historyFile, line + Environment.NewLine);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error saving message: {ex.Message}");
-                // Try alternative location if primary fails
                 try
                 {
                     string fallbackFile = "chat_history_backup.txt";
@@ -268,7 +260,6 @@ namespace SecureIQ_Africa
             }
         }
 
-        // Handle Enter key press in textbox
         private void userInput_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -277,7 +268,6 @@ namespace SecureIQ_Africa
             }
         }
 
-        // Typing effect 
         private async Task TypingAnimation()
         {
             Border typingBorder = new Border()
@@ -297,7 +287,6 @@ namespace SecureIQ_Africa
 
             typingBorder.Child = typingText;
 
-            // Add timestamp
             StackPanel messageStack = new StackPanel();
             TextBlock time = new TextBlock()
             {
@@ -308,7 +297,6 @@ namespace SecureIQ_Africa
             messageStack.Children.Add(time);
             messageStack.Children.Add(typingBorder);
 
-            // Add to chat panel
             Dispatcher.Invoke(() =>
             {
                 ChatPanel.Children.Add(messageStack);
@@ -319,10 +307,8 @@ namespace SecureIQ_Africa
                 }
             });
 
-            // Show typing indicator for 2 seconds
             await Task.Delay(2000);
 
-            // Remove typing indicator
             Dispatcher.Invoke(() =>
             {
                 ChatPanel.Children.Remove(messageStack);
