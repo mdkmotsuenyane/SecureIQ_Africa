@@ -1,0 +1,10 @@
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\bin\Debug\TaskChat.dacpac
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\bin\Debug\TaskChat.dll
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\bin\Debug\TaskChat.pdb
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\obj\Debug\TaskChat.sqlproj.AssemblyReference.cache
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\obj\Debug\Model.xml
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\obj\Debug\refactor.xml
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\obj\Debug\postdeploy.sql
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\obj\Debug\predeploy.sql
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\obj\Debug\TaskChat.dll
+C:\Users\elethu godlo\Downloads\SecureIQ_Africa\SecureIQ_Africa-master\TaskChat\obj\Debug\TaskChat.pdb
