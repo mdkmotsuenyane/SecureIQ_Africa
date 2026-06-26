@@ -354,4 +354,3 @@ For questions or support regarding this project:
 | List Tasks | "list tasks", "show tasks", "my tasks", "what are my tasks" |
 | Delete Task | "delete task #3", "remove task", "clear all tasks" |
 | Quiz | "quiz me", "give me a quiz", "test me", "take a quiz" |
-```
