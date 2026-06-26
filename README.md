@@ -355,7 +355,3 @@ For questions or support regarding this project:
 | Delete Task | "delete task #3", "remove task", "clear all tasks" |
 | Quiz | "quiz me", "give me a quiz", "test me", "take a quiz" |
 ```
-
----
-
-This README now accurately reflects your entire application, including the **Activity Log** window, its in‑memory service, and the extension methods that make logging effortless. Let me know if you need any further adjustments.
